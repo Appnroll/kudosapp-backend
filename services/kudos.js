@@ -12,7 +12,18 @@ const add = ({ to, ...rest }) => {
     })
 }
 
+const calculateRatings = async () => {
+    return Kudos.findAll({
+        attributes: [
+            'givenTo',
+            [models.Sequelize.literal('SUM(points)'), 'totalPoints']
+        ],
+        group: 'givenTo',
+    })
+}
+
 module.exports = {
     getAll,
     add,
+    calculateRatings,
 }
