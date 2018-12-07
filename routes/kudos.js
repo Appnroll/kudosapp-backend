@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const KudosService = require('../services/kudos')
+const request = require('request');
 
 router.get('/', async function (_, res) {
     const results = await KudosService.getAll()
@@ -8,21 +9,31 @@ router.get('/', async function (_, res) {
 })
 
 router.post('/slack', async (req, res) => {
+    res.status(200).send({
+        "text": "✅ Thanks for submitting Kudos!"
+    })
+
     const { token, user_name: from, text, response_url } = req.body
-    console.log(token, from, text, response_url)
     const validToken = process.env.SLACK_TOKEN || 'uguIvg4jtfZ0wQ5r2MOTXBiC'
 
     if (validToken !== token) {
-        raiseFailureToSlack(response_url, 'Incorrect token provided.')
-        res.status(401).send({ error: 'Unauthorized.' })
-        return
+        delayedSlackResponse(response_url, {
+            "text": "Ooups, something went wrong!",
+            "response_type": "ephemeral",
+            "attachments": [
+                {
+                    "text":"Ask your Slack Admin for more details - Auth issue!"
+                }
+            ]
+        })
     }
 
     const values = text.split(';')
     if (values.length !== 3) {
-        raiseFailureToSlack(response_url, 'Incorrect number of parameters.')
-        res.status(400).send({ error: 'Wrong parameters' })
-        return
+        delayedSlackResponse(response_url, {
+            "response_type": "ephemeral",
+            "text": "Incorrect number of parameters!"
+        })
     }
 
     const username = values[0]
@@ -35,16 +46,11 @@ router.post('/slack', async (req, res) => {
     }
 
     if (points != pointsText) {
-        raiseFailureToSlack(response_url, 'Points must be a number.')
-        res.status(400).send({ error: 'Points must be a number' })
-        return
+        delayedSlackResponse(response_url, {
+            "response_type": "ephemeral",
+            "text": "Points must be a number."
+        })
     }
-    console.log(`adding kudos!`, {
-        to: username,
-        points,
-        description,
-        from,
-    })
 
     await KudosService.add({
         to: username,
@@ -52,10 +58,17 @@ router.post('/slack', async (req, res) => {
         description,
         from,
     })
+
+    delayedSlackResponse(response_url, {
+        "response_type": "ephemeral",
+        "text": "Kudos awarded successfully 👑"
+    })
+
 })
 
-const raiseFailureToSlack = (url, reason) => {
+const delayedSlackResponse = (url, reason) => {
     console.log(`raise failure...`, reason)
+    request.post(url, reason, (err) => {})
 }
 
 router.post('/', async function (req, res) {
