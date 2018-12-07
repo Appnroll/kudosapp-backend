@@ -13,3 +13,6 @@ if database is not created, you can provide the name through ENVs and run:
 Once database is created (either by the command above or manually) please run:
 
 `npx sequelize db:migrate`
+
+## Slack integration
+set ENV `SLACK_TOKEN`

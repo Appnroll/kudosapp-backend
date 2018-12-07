@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "npx sequelize db:migrate && node ./bin/www"
+    "start": "node ./bin/www"
   },
   "repository": {
     "type": "git",
