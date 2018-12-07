@@ -2,7 +2,11 @@ const models = require('../models/index')
 const Kudos = models['Kudo']
 
 const getAll = () => {
-    return Kudos.findAll()
+    return Kudos.findAll({
+        order: [
+            ['createdAt', 'ASC']
+        ]
+    })
 }
 
 const add = ({ to, ...rest }) => {
