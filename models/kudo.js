@@ -2,7 +2,7 @@
 module.exports = (sequelize, DataTypes) => {
   const Kudo = sequelize.define('Kudo', {
     givenTo: DataTypes.STRING,
-    points: DataTypes.NUMBER,
+    points: DataTypes.INTEGER,
     from: DataTypes.STRING
   }, {});
   Kudo.associate = function(models) {

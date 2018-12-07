@@ -12,7 +12,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       points: {
-        type: Sequelize.NUMBER
+        type: Sequelize.INTEGER
       },
       from: {
         type: Sequelize.STRING
