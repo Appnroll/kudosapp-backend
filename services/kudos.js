@@ -5,10 +5,14 @@ const getAll = () => {
     return Kudos.findAll()
 }
 
-const add = ({}) => {
-
+const add = ({ to, ...rest }) => {
+    return Kudos.create({
+        givenTo: to,
+        ...rest
+    })
 }
 
 module.exports = {
     getAll,
+    add,
 }
