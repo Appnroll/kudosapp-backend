@@ -74,7 +74,7 @@ const delayedSlackResponse = (url, timeWhenResponseUrlIsAvailable, reason) => {
             console.log('triggering!')
             request.post({
                 url,
-                body: reason,
+                json: reason,
                 headers: {'content-type' : 'application/json'}
             }, (err, _, body) => {
                 console.log(`failure ${url} resulted in ${err}`, body)
