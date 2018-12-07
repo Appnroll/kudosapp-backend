@@ -17,7 +17,7 @@ router.post('/slack', async (req, res) => {
     const validToken = process.env.SLACK_TOKEN || 'uguIvg4jtfZ0wQ5r2MOTXBiC'
 
     if (validToken !== token) {
-        delayedSlackResponse(response_url, {
+        return delayedSlackResponse(response_url, {
             "text": "Ooups, something went wrong!",
             "response_type": "ephemeral",
             "attachments": [
@@ -30,7 +30,7 @@ router.post('/slack', async (req, res) => {
 
     const values = text.split(';')
     if (values.length !== 3) {
-        delayedSlackResponse(response_url, {
+        return delayedSlackResponse(response_url, {
             "response_type": "ephemeral",
             "text": "Incorrect number of parameters!"
         })
@@ -46,7 +46,7 @@ router.post('/slack', async (req, res) => {
     }
 
     if (points != pointsText) {
-        delayedSlackResponse(response_url, {
+        return delayedSlackResponse(response_url, {
             "response_type": "ephemeral",
             "text": "Points must be a number."
         })
@@ -59,7 +59,7 @@ router.post('/slack', async (req, res) => {
         from,
     })
 
-    delayedSlackResponse(response_url, {
+    return delayedSlackResponse(response_url, {
         "response_type": "ephemeral",
         "text": "Kudos awarded successfully 👑"
     })
@@ -67,8 +67,10 @@ router.post('/slack', async (req, res) => {
 })
 
 const delayedSlackResponse = (url, reason) => {
-    console.log(`raise failure...`, reason)
-    request.post(url, reason, (err) => {})
+    console.log(`raise failure...`, reason, `to`, url)
+    request.post(url, reason, (err, out) => {
+        console.log(`failure ${url} resulted in ${err}`, out)
+    })
 }
 
 router.post('/', async function (req, res) {
