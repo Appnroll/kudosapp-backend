@@ -72,8 +72,12 @@ const delayedSlackResponse = (url, timeWhenResponseUrlIsAvailable, reason) => {
     console.log(`raise failure...`, reason, `to`, url, '... waiting ...')
     setTimeout(() => {
             console.log('triggering!')
-            request.post(url, reason, (err, out) => {
-                console.log(`failure ${url} resulted in ${err}`, out)
+            request.post({
+                url,
+                body: reason,
+                headers: {'content-type' : 'application/json'}
+            }, (err, _, body) => {
+                console.log(`failure ${url} resulted in ${err}`, body)
             })
         },
         Math.max(timeWhenResponseUrlIsAvailable - new Date().getTime(), 0) )
