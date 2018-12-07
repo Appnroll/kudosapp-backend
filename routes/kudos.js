@@ -9,6 +9,8 @@ router.get('/', async function (_, res) {
 })
 
 router.post('/slack', async (req, res) => {
+    const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
+
     res.status(200).send({
         "text": "✅ Thanks for submitting Kudos!"
     })
@@ -17,7 +19,7 @@ router.post('/slack', async (req, res) => {
     const validToken = process.env.SLACK_TOKEN || 'uguIvg4jtfZ0wQ5r2MOTXBiC'
 
     if (validToken !== token) {
-        return delayedSlackResponse(response_url, {
+        return delayedSlackResponse(response_url, timeWhenResponseUrlIsAvailable, {
             "text": "Ooups, something went wrong!",
             "response_type": "ephemeral",
             "attachments": [
@@ -30,7 +32,7 @@ router.post('/slack', async (req, res) => {
 
     const values = text.split(';')
     if (values.length !== 3) {
-        return delayedSlackResponse(response_url, {
+        return delayedSlackResponse(response_url, timeWhenResponseUrlIsAvailable, {
             "response_type": "ephemeral",
             "text": "Incorrect number of parameters!"
         })
@@ -46,7 +48,7 @@ router.post('/slack', async (req, res) => {
     }
 
     if (points != pointsText) {
-        return delayedSlackResponse(response_url, {
+        return delayedSlackResponse(response_url, timeWhenResponseUrlIsAvailable, {
             "response_type": "ephemeral",
             "text": "Points must be a number."
         })
@@ -59,18 +61,23 @@ router.post('/slack', async (req, res) => {
         from,
     })
 
-    return delayedSlackResponse(response_url, {
+    return delayedSlackResponse(response_url, timeWhenResponseUrlIsAvailable, {
         "response_type": "ephemeral",
         "text": "Kudos awarded successfully 👑"
     })
 
 })
 
-const delayedSlackResponse = (url, reason) => {
-    console.log(`raise failure...`, reason, `to`, url)
-    request.post(url, reason, (err, out) => {
-        console.log(`failure ${url} resulted in ${err}`, out)
-    })
+const delayedSlackResponse = (url, timeWhenResponseUrlIsAvailable, reason) => {
+    console.log(`raise failure...`, reason, `to`, url, '... waiting ...')
+    setTimeout(() => {
+            console.log('triggering!')
+            request.post(url, reason, (err, out) => {
+                console.log(`failure ${url} resulted in ${err}`, out)
+            })
+        },
+        Math.max(timeWhenResponseUrlIsAvailable - new Date().getTime(), 0) )
+
 }
 
 router.post('/', async function (req, res) {
