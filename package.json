@@ -1,0 +1,27 @@
+{
+  "name": "kup-kudosapp-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Appnroll/kup-kudosapp-backend.git"
+  },
+  "author": "Kamil Gajowy <kamil.gajowy@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Appnroll/kup-kudosapp-backend/issues"
+  },
+  "homepage": "https://github.com/Appnroll/kup-kudosapp-backend#readme",
+  "devDependencies": {
+    "sequelize-cli": "^5.4.0"
+  },
+  "dependencies": {
+    "express": "^4.16.4",
+    "lodash": "^4.17.11",
+    "sequelize": "^4.41.2"
+  }
+}
