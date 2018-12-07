@@ -4,7 +4,7 @@ const Kudos = models['Kudo']
 const getAll = () => {
     return Kudos.findAll({
         order: [
-            ['createdAt', 'ASC']
+            ['createdAt', 'DESC']
         ]
     })
 }
