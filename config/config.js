@@ -18,6 +18,10 @@ module.exports = {
         'password': process.env.DB_PASSWORD || 'root',
         'database': process.env.DB_NAME || 'database_prod',
         'host': process.env.DB_HOST || '127.0.0.1',
-        'dialect': 'postgres'
+        'dialect': 'postgres',
+        "ssl": true,
+        "dialectOptions": {
+            "ssl": true
+        }
     }
 }
