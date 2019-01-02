@@ -20,7 +20,7 @@ const calculateRatings = async () => {
     return Kudos.findAll({
         attributes: [
             'givenTo',
-            [models.Sequelize.literal('SUM(points)'), 'totalPoints']
+            [models.Sequelize.literal('COUNT(*)'), 'totalPoints']
         ],
         group: 'givenTo',
     })
