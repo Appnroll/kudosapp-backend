@@ -26,8 +26,34 @@ const calculateRatings = async () => {
     })
 }
 
+const kudosFromUsers = () => {
+    return Kudos.findAll({
+        attributes: [
+            'from',
+            [models.Sequelize.literal(`extract(year from "createdAt")`), 'year'],
+            [models.Sequelize.literal(`to_char("createdAt", 'Mon')`), 'month'],
+            [models.Sequelize.literal('COUNT(*)'), 'quantity'],
+        ],
+        group: ['from', 'month', 'year']
+    })
+}
+
+const kudosGivenToUsers = () => {
+    return Kudos.findAll({
+        attributes: [
+            'givenTo',
+            [models.Sequelize.literal(`extract(year from "createdAt")`), 'year'],
+            [models.Sequelize.literal(`to_char("createdAt", 'Mon')`), 'month'],
+            [models.Sequelize.literal('COUNT(*)'), 'quantity'],
+        ],
+        group: ['givenTo', 'month', 'year']
+    })
+}
+
 module.exports = {
     getAll,
     add,
     calculateRatings,
+    kudosFromUsers,
+    kudosGivenToUsers
 }
