@@ -40,23 +40,9 @@ router.post('/slack', async (req, res) => {
 
     const username = values[0]
     const description = values[1]
-    const pointsText = values[2]
-    let points
-    try {
-        points = parseInt(pointsText)
-    } catch (e) {
-    }
-
-    if (points != pointsText) {
-        return delayedSlackResponse(response_url, timeWhenResponseUrlIsAvailable, {
-            "response_type": "ephemeral",
-            "text": "Points must be a number."
-        })
-    }
 
     await KudosService.add({
         to: username,
-        points,
         description,
         from,
     })
@@ -87,18 +73,16 @@ const delayedSlackResponse = (url, timeWhenResponseUrlIsAvailable, reason) => {
 router.post('/', async function (req, res) {
     const {
         username,
-        points,
         description,
         from,
     } = req.body
 
-    if (!username || !points || !description || !from) {
+    if (!username || !description || !from) {
         return res.status(400).send({ error: 'Incorrect request.' })
     }
 
     const newKudos = await KudosService.add({
         to: username,
-        points,
         description,
         from,
     })
