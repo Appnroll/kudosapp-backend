@@ -113,6 +113,30 @@ router.get('/ranking', async (req, res) => {
     })))
 })
 
+router.get('/given', async (req, res) => {
+    const results = await KudosService.kudosGivenToUsers()
+    res.send(
+        results.map(r => ({
+            givenTo: r.dataValues.givenTo,
+            mon: r.dataValues.mon,
+            years: r.dataValues.years,
+            quantity: r.dataValues.quantity
+        }))
+    );
+})
+
+router.get('/from', async (req, res) => {
+    const results = await KudosService.kudosFromUsers()
+    res.send(
+        results.map(r => ({
+            from: r.dataValues.from,
+            mon: r.dataValues.mon,
+            years: r.dataValues.years,
+            quantity: r.dataValues.quantity
+        }))
+    );
+})
+
 const mapResponse = (instance) => ({
     name: instance.givenTo,
     description: instance.description,
