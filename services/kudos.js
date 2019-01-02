@@ -34,7 +34,7 @@ const kudosFromUsers = () => {
             [models.Sequelize.literal(`to_char("createdAt", 'Mon')`), 'month'],
             [models.Sequelize.literal('COUNT(*)'), 'quantity'],
         ],
-        group: ['from', 'mon', 'year']
+        group: ['from', 'month', 'year']
     })
 }
 
@@ -46,7 +46,7 @@ const kudosGivenToUsers = () => {
             [models.Sequelize.literal(`to_char("createdAt", 'Mon')`), 'month'],
             [models.Sequelize.literal('COUNT(*)'), 'quantity'],
         ],
-        group: ['givenTo', 'mon', 'year']
+        group: ['givenTo', 'month', 'year']
     })
 }
 
