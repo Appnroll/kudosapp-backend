@@ -16,3 +16,14 @@ Once database is created (either by the command above or manually) please run:
 
 ## Slack integration
 set ENV `SLACK_TOKEN`
+
+## To run app locally
+
+Add script with code below:
+
+```
+const app = require('./app');
+const port = 3000
+
+app.listen(port, () => console.log(`Kudos app on port ${port}!`))
+```
