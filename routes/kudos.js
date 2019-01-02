@@ -118,8 +118,8 @@ router.get('/given', async (req, res) => {
     res.send(
         results.map(r => ({
             givenTo: r.dataValues.givenTo,
-            mon: r.dataValues.mon,
-            years: r.dataValues.years,
+            month: r.dataValues.month,
+            year: r.dataValues.year,
             quantity: r.dataValues.quantity
         }))
     );
@@ -130,8 +130,8 @@ router.get('/from', async (req, res) => {
     res.send(
         results.map(r => ({
             from: r.dataValues.from,
-            mon: r.dataValues.mon,
-            years: r.dataValues.years,
+            month: r.dataValues.month,
+            year: r.dataValues.year,
             quantity: r.dataValues.quantity
         }))
     );
