@@ -1,17 +1,21 @@
 import * as Joi from 'joi';
 import * as fs from 'fs';
 import * as dotenv from 'dotenv'
+import {Injectable} from "@nestjs/common";
 
 export interface EnvConfig {
     [key: string]: string;
 }
 
+@Injectable()
 export class ConfigService {
     private readonly envConfig: EnvConfig;
 
     constructor(filePath: string) {
         const config = dotenv.parse(fs.readFileSync(filePath));
         this.envConfig = this.validateInput(config);
+
+        console.log(this.get('TYPE'));
     }
 
     /**
@@ -24,10 +28,9 @@ export class ConfigService {
                 .valid(['development', 'production', 'test', 'provision'])
                 .default('development'),
             PORT: Joi.number().default(3000),
-            API_AUTH_ENABLED: Joi.boolean().required(),
         });
 
-        const { error, value: validatedEnvConfig } = Joi.validate(
+        const {error, value: validatedEnvConfig} = Joi.validate(
             envConfig,
             envVarsSchema,
         );
@@ -35,5 +38,9 @@ export class ConfigService {
             throw new Error(`Config validation error: ${error.message}`);
         }
         return validatedEnvConfig;
+    }
+
+    get(key: string): string {
+        return this.envConfig[key];
     }
 }

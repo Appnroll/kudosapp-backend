@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "format": "prettier --write \"src/**/*.ts\"",
-    "start": "ts-node -r tsconfig-paths/register src/main.ts",
+    "start": "cross-env NODE_ENV=development ts-node -r tsconfig-paths/register src/main.ts",
     "start:dev": "nodemon",
     "start:debug": "nodemon --config nodemon-debug.json",
     "prestart:prod": "rimraf dist && tsc",
@@ -26,6 +26,7 @@
     "@types/joi": "^14.0.1",
     "dotenv": "^6.2.0",
     "joi": "^14.3.1",
+    "mysql": "^2.16.0",
     "pg": "^7.7.1",
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
