@@ -12,7 +12,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
             password: process.env.DB_PASSWORD || 'appnroll123',
             database: process.env.DB_NAME || 'kudos',
             port: parseInt(process.env.DB_PORT) || 3306,
-            entities: [__dirname + '/**/*.entity{.ts,.js}'],
+            entities: [ __dirname + '/../**/**.entity{.ts,.js}'],
             synchronize: true,
         };
     }
