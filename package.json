@@ -18,7 +18,7 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "test:e2e:watch": "cross-env type=sqlite jest --watch --config ./test/jest-e2e.json"
+    "test:e2e:watch": "cross-env jest --watch --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^5.4.0",
@@ -32,6 +32,7 @@
     "reflect-metadata": "^0.1.12",
     "rimraf": "^2.6.2",
     "rxjs": "^6.2.2",
+    "sqlite3": "^4.0.4",
     "typeorm": "^0.2.10",
     "typescript": "^3.0.1"
   },
