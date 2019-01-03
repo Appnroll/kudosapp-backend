@@ -51,7 +51,7 @@ describe('Kudos (e2e)', () => {
                 .expect(200)
         });
 
-        it('should be successful', () => {
+        it('should return all kudos', () => {
             return request(app.getHttpServer())
                 .get('/kudos')
                 .expect(200)
