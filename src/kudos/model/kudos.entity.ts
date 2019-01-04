@@ -1,4 +1,4 @@
-import {Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
 
 @Entity()
 export class Kudos {
@@ -14,9 +14,9 @@ export class Kudos {
     @Column('text')
     description: string;
 
-    @Column('datetime')
+    @CreateDateColumn({type: 'date'})
     createdAt: Date;
 
-    @Column('datetime')
+    @UpdateDateColumn({type: 'date'})
     updatedAt: Date;
 }

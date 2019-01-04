@@ -1,4 +1,6 @@
 export class KudosDto {
-    constructor(private id: number, private from: string, private givenTo: string, private description: string) {
-    }
+    readonly id: number;
+    readonly from: string;
+    readonly givenTo: string;
+    readonly description: string;
 }
