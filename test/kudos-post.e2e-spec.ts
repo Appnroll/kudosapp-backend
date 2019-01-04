@@ -41,14 +41,18 @@ describe('Kudos (e2e)', () => {
         });
 
         it('should return kudo data', () => {
+            const response = {
+                description: postDto.description,
+                from: postDto.from,
+                givenTo: postDto.user,
+                id: expect.any(Number)
+            } as KudosDto
+
             return request(app.getHttpServer())
                 .post('/kudos')
                 .send(postDto)
                 .then(res => {
-                    const response = res.body as KudosDto
-                    expect(response.description).toBe(postDto.description)
-                    expect(response.from).toBe(postDto.from)
-                    expect(response.givenTo).toBe(postDto.user)
+                    expect(res.body).toMatchObject(response);
                 })
         });
 
