@@ -4,6 +4,8 @@ import {Kudos} from "../model/kudos.entity";
 import {KudosDto} from "../dto/kudos.dto";
 import {PostKudosDto} from "../dto/post-kudos.dto";
 import {KudosRankingDto} from "../dto/kudos-ranking.dto";
+import {KudosFromDto} from "../dto/kudos-from.dto";
+import {KudosGivenDto} from "../dto/kudos-given.dto";
 
 @Controller('kudos')
 export class KudosController {
@@ -21,6 +23,18 @@ export class KudosController {
     async getRankings(): Promise<KudosRankingDto[]> {
         const kudos = await this.kudosService.getRankings();
         return kudos.map(el => ({name: el.givenTo, totalPoints: el.totalPoints}));
+    }
+
+    @Get('from')
+    async kudosFromUsers(): Promise<KudosFromDto[]> {
+        const kudos = await this.kudosService.getFrom();
+        return kudos.map(el => ({quantity: Number(el.quantity), year: el.year, from: el.from, month: el.month}));
+    }
+
+    @Get('given')
+    async kudosGivenToUsers(): Promise<KudosGivenDto[]> {
+        const kudos = await this.kudosService.getGiven();
+        return kudos.map(el => ({quantity: Number(el.quantity), year: el.year, givenTo: el.givenTo, month: el.month}));
     }
 
     @Post()

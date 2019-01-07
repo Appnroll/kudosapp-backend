@@ -27,10 +27,10 @@ describe('Kudos (e2e)', () => {
         await app.init();
     });
 
-    describe('(GET) /ranking ', () => {
+    describe('(GET) /kudos/given ', () => {
         it('should return empty response', () => {
             return request(app.getHttpServer())
-                .get('/kudos/rankings')
+                .get('/kudos/given')
                 .expect(200)
                 .then(res => {
                     expect(res.body.length).toBe([].length)
@@ -39,15 +39,13 @@ describe('Kudos (e2e)', () => {
 
     })
 
-    describe('(GET) /ranking ', () => {
+    describe('(GET) /kudos/given ', () => {
         beforeEach(async () => {
             const exp = [...Array(5).keys()].map(el => kudosRepository.create({
                 id: el + 1,
                 description: `${el} desc`,
                 givenTo: `${el} dota`,
-                from: `dota`,
-                createdAt: new Date(),
-                updatedAt: new Date()
+                from: `dota`
             }));
 
             await kudosRepository.save(exp);
@@ -59,19 +57,48 @@ describe('Kudos (e2e)', () => {
 
         it('should be successful', () => {
             return request(app.getHttpServer())
-                .get('/kudos/rankings')
+                .get('/kudos/given')
                 .expect(200)
         });
 
         it('should return correct ranking data', () => {
+            const response = [
+                {
+                    quantity: 1,
+                    year: expect.any(Number),
+                    month: expect.any(String),
+                    givenTo: '0 dota'
+                },
+                {
+                    quantity: 1,
+                    year: expect.any(Number),
+                    month: expect.any(String),
+                    givenTo: '1 dota'
+                },
+                {
+                    quantity: 1,
+                    year: expect.any(Number),
+                    month: expect.any(String),
+                    givenTo: '2 dota'
+                }, {
+                    quantity: 1,
+                    year: expect.any(Number),
+                    month: expect.any(String),
+                    givenTo: '3 dota'
+                },
+                {
+                    quantity: 1,
+                    year: expect.any(Number),
+                    month: expect.any(String),
+                    givenTo: '4 dota'
+                }
+
+            ]
             return request(app.getHttpServer())
-                .get('/kudos/rankings')
+                .get('/kudos/given')
                 .expect(200)
                 .then(res => {
-                    expect(res.body.length).toBe(5)
-                    res.body.forEach((el) => {
-                        expect(Number(el.totalPoints)).toBe(1)
-                    })
+                    expect(res.body).toMatchObject(response)
                 })
         });
     })

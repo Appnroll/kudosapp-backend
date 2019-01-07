@@ -22,6 +22,32 @@ export class KudosService {
             .getRawMany();
     }
 
+    async getFrom(): Promise<{quantity: number, year: number, month: string, from: string}[]> {
+        return await this.kudosRepository.createQueryBuilder("Kudos")
+            .select('COUNT(*)', 'quantity')
+            .addSelect(`extract(year from "createdAt")`, 'year')
+            .addSelect(`to_char("createdAt", 'Mon')`, 'month')
+            .addSelect([`"from"`])
+            .addGroupBy(`"from"`)
+            .addGroupBy('month')
+            .addGroupBy('year')
+            .addOrderBy(`"from"`, "ASC")
+            .getRawMany();
+    }
+
+    async getGiven(): Promise<{quantity: number, year: number, month: string, givenTo: string}[]> {
+        return await this.kudosRepository.createQueryBuilder("Kudos")
+            .select('COUNT(*)', 'quantity')
+            .addSelect(`extract(year from "createdAt")`, 'year')
+            .addSelect(`to_char("createdAt", 'Mon')`, 'month')
+            .addSelect([`"givenTo"`])
+            .addGroupBy(`"givenTo"`)
+            .addGroupBy('month')
+            .addGroupBy('year')
+            .addOrderBy(`"givenTo"`, "ASC")
+            .getRawMany();
+    }
+
     async saveKudos(kudosData: PostKudosDto): Promise<Kudos> {
         const kudo = this.kudosRepository.create(kudosData)
         kudo.givenTo = kudosData.user

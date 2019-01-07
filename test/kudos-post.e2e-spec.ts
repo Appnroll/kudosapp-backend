@@ -33,6 +33,10 @@ describe('Kudos (e2e)', () => {
 
         const postDto = {user: 'dota', from: 'dota allstars', description: 'for refactor'} as PostKudosDto;
 
+        afterEach(async () => {
+            await kudosRepository.clear();
+        });
+
         it('should be successful', () => {
             return request(app.getHttpServer())
                 .post('/kudos')
@@ -56,10 +60,24 @@ describe('Kudos (e2e)', () => {
                 })
         });
 
-        it('should fail on missing data', () => {
+        it('should fail on missing description data', () => {
             return request(app.getHttpServer())
                 .post('/kudos')
                 .send({user: postDto.user, from: postDto.from})
+                .expect(HttpStatus.BAD_REQUEST)
+        });
+
+        it('should fail on missing user data', () => {
+            return request(app.getHttpServer())
+                .post('/kudos')
+                .send({description: postDto.description, from: postDto.from})
+                .expect(HttpStatus.BAD_REQUEST)
+        });
+
+        it('should fail on missing from data', () => {
+            return request(app.getHttpServer())
+                .post('/kudos')
+                .send({user: postDto.user, description: postDto.description})
                 .expect(HttpStatus.BAD_REQUEST)
         });
     })

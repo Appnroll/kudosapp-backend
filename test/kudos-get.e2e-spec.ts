@@ -23,7 +23,7 @@ describe('Kudos (e2e)', () => {
 
         app = moduleFixture.createNestApplication();
         kudosRepository = moduleFixture.get<Repository<Kudos>>(getRepositoryToken(Kudos));
-
+        await kudosRepository.clear();
         await app.init();
     });
 
