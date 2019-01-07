@@ -80,4 +80,9 @@ export class KudosController {
         return {text: '✅ Thanks for submitting Kudos!'}
     }
 
+    @Get('slackAvatars')
+    async getAvatars(){
+        await this.kudosService.getAvatars();
+    }
+
 }

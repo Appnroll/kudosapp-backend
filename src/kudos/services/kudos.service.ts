@@ -64,4 +64,11 @@ export class KudosService {
         )
     }
 
+    async getAvatars() {
+        const req = await this.httpService.get('https://slack.com/api/users.list?token=57146102a88e9d077293e0dfc7395f8c');
+        req.subscribe((er) => {
+            console.log(er);
+        })
+    }
+
 }
