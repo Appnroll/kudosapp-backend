@@ -6,6 +6,7 @@ import {PostKudosDto} from "../dto/post-kudos.dto";
 import {KudosRankingDto} from "../dto/kudos-ranking.dto";
 import {KudosFromDto} from "../dto/kudos-from.dto";
 import {KudosGivenDto} from "../dto/kudos-given.dto";
+import {PostSlackDto} from "../dto/post-slack.dto";
 
 @Controller('kudos')
 export class KudosController {
@@ -45,6 +46,38 @@ export class KudosController {
         }
         const kudo = await this.kudosService.saveKudos(body)
         return {id: kudo.id, from: kudo.from, givenTo: kudo.givenTo, description: kudo.description}
+    }
+
+    @Post('slack')
+    @HttpCode(201)
+    async postSlack(@Body() body: PostSlackDto): Promise<{ text: string }> {
+        const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
+        const validToken = process.env.SLACK_TOKEN || 'uguIvg4jtfZ0wQ5r2MOTXBiC'
+
+        if (validToken !== body.token) {
+            this.kudosService.delayedSlackResponse(body.response_url, timeWhenResponseUrlIsAvailable, {
+                "text": "Ooups, something went wrong!",
+                "response_type": "ephemeral",
+                "attachments": [
+                    {
+                        "text": "Ask your Slack Admin for more details - Auth issue!"
+                    }
+                ]
+            })
+            return;
+        }
+
+        const values = body.text.split(';')
+        const username = values[0]
+        const description = values[1]
+
+        await this.kudosService.saveKudos({description: description, from: username, user: body.from})
+        this.kudosService.delayedSlackResponse(body.response_url, timeWhenResponseUrlIsAvailable, {
+            "response_type": "ephemeral",
+            "text": "Kudos awarded successfully 👑"
+        })
+
+        return {text: '✅ Thanks for submitting Kudos!'}
     }
 
 }

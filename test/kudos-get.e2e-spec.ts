@@ -27,6 +27,10 @@ describe('Kudos (e2e)', () => {
         await app.init();
     });
 
+    afterAll(async () => {
+        await kudosRepository.clear();
+    })
+
     describe('(GET) / ', () => {
         beforeEach(async () => {
             const exp = [...Array(5).keys()].map(el => kudosRepository.create({

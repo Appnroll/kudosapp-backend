@@ -27,6 +27,10 @@ describe('Kudos (e2e)', () => {
         await app.init();
     });
 
+    afterAll(async () => {
+        await kudosRepository.clear();
+    })
+
     describe('(GET) /from ', () => {
         it('should return empty response', () => {
             return request(app.getHttpServer())

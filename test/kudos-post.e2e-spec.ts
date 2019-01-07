@@ -29,6 +29,10 @@ describe('Kudos (e2e)', () => {
         await app.init();
     });
 
+    afterAll(async () => {
+        await kudosRepository.clear();
+    })
+
     describe('(POST) / ', () => {
 
         const postDto = {user: 'dota', from: 'dota allstars', description: 'for refactor'} as PostKudosDto;
