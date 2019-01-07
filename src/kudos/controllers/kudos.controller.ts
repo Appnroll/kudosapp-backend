@@ -2,7 +2,7 @@ import {Body, Controller, Get, HttpCode, HttpException, HttpStatus, Post} from '
 import {KudosService} from "../services/kudos.service";
 import {Kudos} from "../model/kudos.entity";
 import {KudosDto} from "../dto/kudos.dto";
-import {PostKudosDto} from "../dto/postKudos.dto";
+import {PostKudosDto} from "../dto/post-kudos.dto";
 import {KudosRankingDto} from "../dto/kudos-ranking.dto";
 
 @Controller('kudos')
@@ -20,8 +20,7 @@ export class KudosController {
     @Get('rankings')
     async getRankings(): Promise<KudosRankingDto[]> {
         const kudos = await this.kudosService.getRankings();
-        console.log(kudos)
-        return [];
+        return kudos.map(el => ({name: el.givenTo, totalPoints: el.totalPoints}));
     }
 
     @Post()

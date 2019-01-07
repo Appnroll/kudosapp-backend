@@ -56,7 +56,10 @@ describe('Kudos (e2e)', () => {
                 .get('/kudos/rankings')
                 .expect(200)
                 .then(res => {
-                    console.log(res.body)
+                    expect(res.body.length).toBe(5)
+                    res.body.forEach((el) => {
+                        expect(Number(el.totalPoints)).toBe(1)
+                    })
                 })
         });
     })

@@ -14,6 +14,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
             port: parseInt(process.env.DB_PORT) || 3306,
             entities: [ __dirname + '/../**/**.entity{.ts,.js}'],
             synchronize: true,
+            logging: true
         };
     }
 }

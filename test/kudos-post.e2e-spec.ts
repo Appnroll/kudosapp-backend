@@ -6,7 +6,7 @@ import {Repository} from "typeorm";
 import {Kudos} from "../src/kudos/model/kudos.entity";
 import {getRepositoryToken, TypeOrmModule} from '@nestjs/typeorm';
 import {TypeOrmConfigTestService} from "../src/config/type-orm-config-test.service";
-import {PostKudosDto} from "../src/kudos/dto/postKudos.dto";
+import {PostKudosDto} from "../src/kudos/dto/post-kudos.dto";
 import {KudosDto} from "../src/kudos/dto/kudos.dto";
 
 describe('Kudos (e2e)', () => {

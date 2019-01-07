@@ -2,7 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {Kudos} from "../model/kudos.entity";
 import {Repository} from "typeorm";
 import {InjectRepository} from '@nestjs/typeorm';
-import {PostKudosDto} from "../dto/postKudos.dto";
+import {PostKudosDto} from "../dto/post-kudos.dto";
 
 @Injectable()
 export class KudosService {
@@ -14,11 +14,11 @@ export class KudosService {
         return await this.kudosRepository.find();
     }
 
-    async getRankings(): Promise<Kudos[]> {
-        return await this.kudosRepository.createQueryBuilder("kudos")
-            .select("\'givenTo\'")
+    async getRankings(): Promise<{givenTo: string, totalPoints: number}[]> {
+        return await this.kudosRepository.createQueryBuilder("Kudos")
             .select('COUNT(*)', 'totalPoints')
-            .addGroupBy("\'kudos.givenTo\'")
+            .addSelect(['\"givenTo\"'])
+            .addGroupBy('\"givenTo\"')
             .getRawMany();
     }
 
