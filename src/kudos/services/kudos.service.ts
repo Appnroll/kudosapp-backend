@@ -57,7 +57,6 @@ export class KudosService {
     }
 
     delayedSlackResponse(url: string, timeWhenResponseUrlIsAvailable: number, reason: {}) {
-        console.log(`raise failure...`, reason, `to`, url, '... waiting ...')
         setTimeout(
             () => (
                 this.httpService.post(url, reason, {headers: {'content-type': 'application/json'}})
