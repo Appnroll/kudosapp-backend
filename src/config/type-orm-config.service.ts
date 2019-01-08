@@ -13,7 +13,7 @@ export class TypeOrmConfigService implements TypeOrmOptionsFactory {
             database: process.env.DB_NAME || 'kudos',
             port: parseInt(process.env.DB_PORT) || 3306,
             entities: [ __dirname + '/../**/**.entity{.ts,.js}'],
-            synchronize: true,
+            synchronize: process.env.NODE_ENV !== 'production',
             logging: true
         };
     }
