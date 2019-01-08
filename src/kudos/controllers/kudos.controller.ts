@@ -71,6 +71,9 @@ export class KudosController {
             const description = values[1]
 
             await this.kudosService.saveKudos({description: description, from: body.user_name, user: givenToUser})
+
+            console.log(body)
+
             this.kudosService.delayedSlackResponse(body.response_url, timeWhenResponseUrlIsAvailable, {
                 "response_type": "ephemeral",
                 "text": "Kudos awarded successfully 👑"
