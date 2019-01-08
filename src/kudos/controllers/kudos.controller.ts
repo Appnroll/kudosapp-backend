@@ -67,10 +67,10 @@ export class KudosController {
             return;
         } else {
             const values = body.text.split(';')
-            const username = values[0]
+            const givenToUser = values[0]
             const description = values[1]
 
-            await this.kudosService.saveKudos({description: description, from: username, user: body.from})
+            await this.kudosService.saveKudos({description: description, from: body.user_name, user: givenToUser})
             this.kudosService.delayedSlackResponse(body.response_url, timeWhenResponseUrlIsAvailable, {
                 "response_type": "ephemeral",
                 "text": "Kudos awarded successfully 👑"
@@ -81,7 +81,7 @@ export class KudosController {
     }
 
     @Get('slackAvatars')
-    async getAvatars(){
+    async getAvatars() {
         await this.kudosService.getAvatars();
     }
 

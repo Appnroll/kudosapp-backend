@@ -1,11 +1,11 @@
 import {INestApplication} from '@nestjs/common';
 import {Test} from '@nestjs/testing';
 import * as request from 'supertest';
-import {AppModule} from '../src/app.module';
 import {Repository} from "typeorm";
 import {Kudos} from "../src/kudos/model/kudos.entity";
 import {getRepositoryToken, TypeOrmModule} from '@nestjs/typeorm';
 import {TypeOrmConfigTestService} from "../src/config/type-orm-config-test.service";
+import {AppModule} from "../src/app.module";
 
 describe('Kudos (e2e)', () => {
     let app: INestApplication;
@@ -23,7 +23,7 @@ describe('Kudos (e2e)', () => {
 
         app = moduleFixture.createNestApplication();
         kudosRepository = moduleFixture.get<Repository<Kudos>>(getRepositoryToken(Kudos));
-        await kudosRepository.clear();
+
         await app.init();
     });
 
@@ -31,19 +31,12 @@ describe('Kudos (e2e)', () => {
         await kudosRepository.clear();
     })
 
-    describe('(GET) / ', () => {
-        beforeEach(async () => {
-            const exp = [...Array(5).keys()].map(el => kudosRepository.create({
-                id: el + 1,
-                description: `${el} desc`,
-                givenTo: `${el} dota`,
-                from: `dota`,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            }));
+    describe('(POST) /slack ', () => {
 
-            await kudosRepository.save(exp);
-        });
+        const postDto = {text: 'dota; dota', token: 'uguIvg4jtfZ0wQ5r2MOTXBiC', user_name: 'FROM DOTA HIMSELF'};
+        const successfulResponse = {
+            text: `✅ Thanks for submitting Kudos!`
+        }
 
         afterEach(async () => {
             await kudosRepository.clear();
@@ -51,17 +44,11 @@ describe('Kudos (e2e)', () => {
 
         it('should be successful', () => {
             return request(app.getHttpServer())
-                .get('/kudos')
-                .expect(200)
-        });
-
-        it('should return all kudos', () => {
-            return request(app.getHttpServer())
-                .get('/kudos')
-                .expect(200)
+                .post('/kudos/slack')
+                .send(postDto)
+                .expect(201)
                 .then(res => {
-                    expect(Array.isArray(res.body)).toBe(true);
-                    expect(res.body.length).toBe(5);
+                    expect(res.body).toMatchObject(successfulResponse)
                 })
         });
     })

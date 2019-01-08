@@ -1,11 +1,11 @@
 import {INestApplication} from '@nestjs/common';
 import {Test} from '@nestjs/testing';
 import * as request from 'supertest';
-import {AppModule} from '../src/app.module';
 import {Repository} from "typeorm";
 import {Kudos} from "../src/kudos/model/kudos.entity";
 import {getRepositoryToken, TypeOrmModule} from '@nestjs/typeorm';
 import {TypeOrmConfigTestService} from "../src/config/type-orm-config-test.service";
+import {AppModule} from "../src/app.module";
 
 describe('Kudos (e2e)', () => {
     let app: INestApplication;
