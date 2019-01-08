@@ -3,6 +3,7 @@ import { AppModule } from './app.module';
 
 
 console.log(`${process.env.DB_HOST} - ${process.env.DB_USERNAME} - ${process.env.DB_NAME} `);
+console.log(`PORT: ${process.env.PORT} `);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
