@@ -59,7 +59,12 @@ export class KudosService {
     delayedSlackResponse(url: string, timeWhenResponseUrlIsAvailable: number, reason: {}) {
         console.log(`raise failure...`, reason, `to`, url, '... waiting ...')
         setTimeout(
-            () => (this.httpService.post(url, reason, {headers: {'content-type': 'application/json'}})),
+            () => (
+                this.httpService.post(url, reason, {headers: {'content-type': 'application/json'}})
+                    .subscribe((req) => {
+                        console.log('req success');
+                    })
+            ),
             Math.max(timeWhenResponseUrlIsAvailable - new Date().getTime(), 0)
         )
     }
