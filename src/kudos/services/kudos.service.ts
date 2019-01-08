@@ -61,9 +61,9 @@ export class KudosService {
         setTimeout(
             () => (
                 this.httpService.post(url, reason, {headers: {'content-type': 'application/json'}})
-                    .subscribe((req) => {
-                        console.log('req success');
-                    })
+                    .toPromise()
+                    .then()
+                    .catch(console.log)
             ),
             Math.max(timeWhenResponseUrlIsAvailable - new Date().getTime(), 0)
         )
@@ -75,5 +75,4 @@ export class KudosService {
             console.log(er);
         })
     }
-
 }
