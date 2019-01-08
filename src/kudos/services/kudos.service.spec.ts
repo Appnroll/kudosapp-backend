@@ -20,11 +20,6 @@ describe('KudosService', () => {
             ],
             providers: [
                 KudosService,
-                {
-                    useClass: asdsa
-
-
-                }
             ],
         }).compile();
         service = module.get<KudosService>(KudosService);
