@@ -16,9 +16,9 @@ export class KudosController {
 
     @Get()
     async getKudos(): Promise<KudosDto[]> {
-        const kudos = await this.kudosService.getAll();
-        return kudos.map((r: Kudos) => ({id: r.id, from: r.from, givenTo: r.givenTo, description: r.description}))
+        return await this.kudosService.getAllWithAvatars();
     }
+
 
     @Get('rankings')
     async getRankings(): Promise<KudosRankingDto[]> {
@@ -79,10 +79,4 @@ export class KudosController {
 
         return {text: '✅ Thanks for submitting Kudos!'}
     }
-
-    @Get('slackAvatars')
-    async getAvatars() {
-        await this.kudosService.getAvatars();
-    }
-
 }
