@@ -1,17 +1,17 @@
 import {Body, Controller, Get, HttpCode, HttpException, HttpStatus, Post} from '@nestjs/common';
 import {KudosService} from "../services/kudos.service";
-import {Kudos} from "../model/kudos.entity";
 import {KudosDto} from "../dto/kudos.dto";
 import {PostKudosDto} from "../dto/post-kudos.dto";
 import {KudosRankingDto} from "../dto/kudos-ranking.dto";
 import {KudosFromDto} from "../dto/kudos-from.dto";
 import {KudosGivenDto} from "../dto/kudos-given.dto";
 import {PostSlackDto} from "../dto/post-slack.dto";
+import {UserService} from "../services/user.service";
 
 @Controller('kudos')
 export class KudosController {
 
-    constructor(private kudosService: KudosService) {
+    constructor(private kudosService: KudosService, private userSerivce: UserService) {
     }
 
     @Get()
@@ -70,13 +70,19 @@ export class KudosController {
             const givenToUser = values[0]
             const description = values[1]
 
-            await this.kudosService.saveKudos({description: description, from: body.user_name, user: givenToUser})
-            this.kudosService.delayedSlackResponse(body.response_url, timeWhenResponseUrlIsAvailable, {
-                "response_type": "ephemeral",
-                "text": "Kudos awarded successfully 👑"
-            })
+            if (!this.userSerivce.checkIfUserExist(givenToUser)) {
+                this.kudosService.delayedSlackResponse(body.response_url, timeWhenResponseUrlIsAvailable, {
+                    "text": "User does not exist, please check name!",
+                    "response_type": "ephemeral"
+                })
+            } else {
+                await this.kudosService.saveKudos({description: description, from: body.user_name, user: givenToUser})
+                this.kudosService.delayedSlackResponse(body.response_url, timeWhenResponseUrlIsAvailable, {
+                    "response_type": "ephemeral",
+                    "text": "Kudos awarded successfully 👑"
+                })
+            }
         }
-
         return {text: '✅ Thanks for submitting Kudos!'}
     }
 }

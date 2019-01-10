@@ -9,6 +9,14 @@ export class UserService {
     constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {
     }
 
+    async checkIfUserExist(username: string) {
+        const hasAt = username.indexOf('@')
+        if (hasAt > 0) {
+            username = username.substring(1);
+        }
+        return await this.userRepository.find({name: username})
+    }
+
     async getAll(): Promise<User[]> {
         return await this.userRepository.find();
     }
