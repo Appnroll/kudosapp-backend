@@ -10,11 +10,11 @@ export class UserService {
     }
 
     async checkIfUserExist(username: string) {
-        const hasAt = username.indexOf('@')
-        if (hasAt > 0) {
+        const hasAt = username.indexOf('\@')
+        if (hasAt >= 0) {
             username = username.substring(1);
         }
-        return await this.userRepository.find({name: username})
+        return await this.userRepository.findOne({name: username})
     }
 
     async getAll(): Promise<User[]> {

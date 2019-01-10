@@ -55,6 +55,7 @@ export class KudosController {
         const validToken = process.env.SLACK_TOKEN || 'uguIvg4jtfZ0wQ5r2MOTXBiC'
 
         if (validToken !== body.token) {
+            console.log('invalid')
             this.kudosService.delayedSlackResponse(body.response_url, timeWhenResponseUrlIsAvailable, {
                 "text": "Ooups, something went wrong!",
                 "response_type": "ephemeral",
@@ -69,8 +70,8 @@ export class KudosController {
             const values = body.text.split(';')
             const givenToUser = values[0]
             const description = values[1]
-
-            if (!this.userSerivce.checkIfUserExist(givenToUser)) {
+            const userExist = await this.userSerivce.checkIfUserExist(givenToUser);
+            if (!userExist) {
                 this.kudosService.delayedSlackResponse(body.response_url, timeWhenResponseUrlIsAvailable, {
                     "text": "User does not exist, please check name!",
                     "response_type": "ephemeral"
