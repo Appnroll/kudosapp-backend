@@ -23,8 +23,8 @@ export class KudosService {
         const kudos = await this.getAll();
         const users = await this.userService.getAll();
         return kudos.map((r: Kudos) => {
-            const fromUser = users.find(el => el.name === r.from)
-            const givenToUser = users.find(el => el.name === r.givenTo)
+            const fromUser = users.find(el => el.name === r.from || r.from === `@${el.name}`)
+            const givenToUser = users.find(el => el.name === r.givenTo || r.givenTo === `@${el.name}`)
             let fromAvatar: AvatarDto, givenToAvatar: AvatarDto;
             if (fromUser) {
                 fromAvatar = {
