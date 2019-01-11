@@ -118,6 +118,9 @@ export class KudosController {
                 }
                 ).toPromise()
 
+        console.log(req.body);
+        console.log(req.data);
+
         return {text: '✅ Thanks for submitting Kudos!'}
     }
 }
