@@ -53,8 +53,14 @@ export class KudosController {
     @Post('slack')
     @HttpCode(201)
     async postSlack(@Body() body: PostSlackDto): Promise<{ text: string }> {
+
+        console.log(body)
+
         const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
+
+
         const validToken = process.env.SLACK_TOKEN || 'uguIvg4jtfZ0wQ5r2MOTXBiC'
+
 
         if (validToken !== body.token) {
             console.log('invalid')
