@@ -101,30 +101,34 @@ export class KudosController {
         console.log('in slack save single kudo')
         console.log(body)
 
+        const payloadBody = JSON.parse(body.payload);
+
+        console.log(payloadBody)
+
         const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
         const validToken = process.env.SLACK_TOKEN || 'hDa8MTD79bTgTpfAQ8W6cWc4'
-        if (validToken !== body.payload.token) {
+        if (validToken !== payloadBody.token) {
             console.log('invalid token')
-            this.slackService.responseInvalidToken(body.payload.response_url, timeWhenResponseUrlIsAvailable)
+            this.slackService.responseInvalidToken(payloadBody.response_url, timeWhenResponseUrlIsAvailable)
         } else {
-            if (!body.payload.submission.kudos_given) {
-                this.slackService.responseInvalidUsername(body.payload.response_url, timeWhenResponseUrlIsAvailable)
+            if (!payloadBody.submission.kudos_given) {
+                this.slackService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable)
                 return;
             }
-            const user = await this.userService.findUserBySlackId(body.payload.submission.kudos_given)
+            const user = await this.userService.findUserBySlackId(payloadBody.submission.kudos_given)
             if (!user) {
-                this.slackService.responseInvalidUsername(body.payload.response_url, timeWhenResponseUrlIsAvailable)
+                this.slackService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable)
                 return;
             }
 
             console.log('saving kudo')
 
             await this.kudosService.saveKudos({
-                description: body.payload.submission.description,
-                from: body.payload.user.name,
+                description: payloadBody.submission.description,
+                from: payloadBody.user.name,
                 user: user.name
             })
-            this.slackService.responseOk(body.payload.response_url, timeWhenResponseUrlIsAvailable);
+            this.slackService.responseOk(payloadBody.response_url, timeWhenResponseUrlIsAvailable);
         }
     }
 }
