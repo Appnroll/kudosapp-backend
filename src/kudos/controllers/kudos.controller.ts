@@ -93,8 +93,14 @@ export class KudosController {
         console.log('body')
         console.log(body)
         console.log(body.trigger_id)
+
+        const headersRequest = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
+        };
+
         const req: any = await this.httpService
-            .post(`https://slack.com/api/dialog.open?token=${process.env.SLACK_OAUTH_TOKEN}&trigger_id=${body.trigger_id}`,
+            .post(`https://slack.com/api/dialog.open`,
                 {
                     "trigger_id": `${body.trigger_id}`,
                     "dialog": {
@@ -116,8 +122,7 @@ export class KudosController {
                             }
                         ]
                     }
-                }
-                , {headers: {'Content-type': 'application/json'}}).toPromise()
+                }, {headers: headersRequest}).toPromise()
 
         console.log(req.body);
         console.log(req.data);
