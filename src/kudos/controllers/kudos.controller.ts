@@ -57,10 +57,7 @@ export class KudosController {
         console.log(body)
 
         const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
-
-
-        const validToken = process.env.SLACK_TOKEN || 'uguIvg4jtfZ0wQ5r2MOTXBiC'
-
+        const validToken = process.env.SLACK_TOKEN || 'hDa8MTD79bTgTpfAQ8W6cWc4'
 
         if (validToken !== body.token) {
             console.log('invalid')
