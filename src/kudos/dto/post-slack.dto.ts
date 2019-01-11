@@ -3,4 +3,5 @@ export class PostSlackDto {
     readonly user_name: string;
     readonly text: string;
     readonly response_url: string;
+    readonly trigger_id: string;
 }

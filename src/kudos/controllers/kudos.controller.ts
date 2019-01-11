@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpCode, HttpException, HttpStatus, Post} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, HttpException, HttpService, HttpStatus, Post} from '@nestjs/common';
 import {KudosService} from "../services/kudos.service";
 import {KudosDto} from "../dto/kudos.dto";
 import {PostKudosDto} from "../dto/post-kudos.dto";
@@ -11,7 +11,9 @@ import {UserService} from "../services/user.service";
 @Controller('kudos')
 export class KudosController {
 
-    constructor(private kudosService: KudosService, private userSerivce: UserService) {
+    constructor(private kudosService: KudosService,
+                private userService: UserService,
+                private httpService: HttpService) {
     }
 
     @Get()
@@ -70,7 +72,7 @@ export class KudosController {
             const values = body.text.split(';')
             const givenToUser = values[0]
             const description = values[1]
-            const userExist = await this.userSerivce.checkIfUserExist(givenToUser);
+            const userExist = await this.userService.checkIfUserExist(givenToUser);
             if (!userExist) {
                 this.kudosService.delayedSlackResponse(body.response_url, timeWhenResponseUrlIsAvailable, {
                     "text": "User does not exist, please check name!",
@@ -84,6 +86,35 @@ export class KudosController {
                 })
             }
         }
+
+        console.log('body')
+        console.log(body)
+        const req: any = await this.httpService
+            .post(`https://slack.com/api/dialog.open?token=${process.env.SLACK_OAUTH_TOKEN}`,
+                {
+                    "trigger_id": `${body.trigger_id}`,
+                    "dialog": {
+                        "callback_id": `kudos-${Math.random().toString(36).substring(7)}`,
+                        "title": "Request a Ride",
+                        "submit_label": "Request",
+                        "notify_on_cancel": true,
+                        "state": "Limo",
+                        "elements": [
+                            {
+                                "type": "text",
+                                "label": "Pickup Location",
+                                "name": "loc_origin"
+                            },
+                            {
+                                "type": "text",
+                                "label": "Dropoff Location",
+                                "name": "loc_destination"
+                            }
+                        ]
+                    }
+                }
+                ).toPromise()
+
         return {text: '✅ Thanks for submitting Kudos!'}
     }
 }
