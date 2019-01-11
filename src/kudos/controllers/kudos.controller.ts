@@ -1,7 +1,6 @@
-import {Body, Controller, Get, HttpCode, HttpException, HttpService, HttpStatus, Post} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, Post} from '@nestjs/common';
 import {KudosService} from "../services/kudos.service";
 import {KudosDto} from "../dto/kudos.dto";
-import {PostKudosDto} from "../dto/post-kudos.dto";
 import {KudosRankingDto} from "../dto/kudos-ranking.dto";
 import {KudosFromDto} from "../dto/kudos-from.dto";
 import {KudosGivenDto} from "../dto/kudos-given.dto";
@@ -16,13 +15,13 @@ export class KudosController {
 
     constructor(private kudosService: KudosService,
                 private userService: UserService,
-                private slackService: SlackService,
-                private httpService: HttpService) {
+                private slackService: SlackService) {
     }
 
     @Get()
     async getKudos(): Promise<KudosDto[]> {
-        return await this.kudosService.getAllWithAvatars();
+        // return await this.kudosService.getAllWithAvatars();
+        return []
     }
 
 
@@ -44,19 +43,19 @@ export class KudosController {
         return kudos.map(el => ({quantity: Number(el.quantity), year: el.year, givenTo: el.givenTo, month: el.month}));
     }
 
-    @Post()
-    @HttpCode(201)
-    async postKudos(@Body() body: PostKudosDto): Promise<KudosDto> {
-        if (!body.description || !body.from || !body.user) {
-            throw new HttpException('Wrong input', HttpStatus.BAD_REQUEST)
-        }
-        const kudo = await this.kudosService.saveKudos(body)
-        return {id: kudo.id, from: kudo.from, givenTo: kudo.givenTo, description: kudo.description}
-    }
+    // @Post()
+    // @HttpCode(201)
+    // async postKudos(@Body() body: PostKudosDto): Promise<KudosDto> {
+    //     if (!body.description || !body.from || !body.user) {
+    //         throw new HttpException('Wrong input', HttpStatus.BAD_REQUEST)
+    //     }
+    //     const kudo = await this.kudosService.saveKudos(body)
+    //     return {id: kudo.id, from: kudo.from, givenTo: kudo.givenTo, description: kudo.description}
+    // }
 
     @Post('multikudos')
     @HttpCode(201)
-    async postSlack(@Body() body: PostSlackDto & DialogPostSlackDto): Promise<{ text: string }> {
+    async postSlack(@Body() body: PostSlackDto): Promise<{ text: string }> {
         const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
         const validToken = process.env.SLACK_TOKEN || 'hDa8MTD79bTgTpfAQ8W6cWc4'
 
@@ -64,20 +63,17 @@ export class KudosController {
             this.slackService.responseInvalidToken(body.response_url, timeWhenResponseUrlIsAvailable)
         } else {
             const values = body.text.split(';')
-            const givenToUser = values[0]
-            const [description, ...users] = values.reverse();
-            const userExist = await this.userService.checkIfUserExist(givenToUser);
-            if (!userExist) {
+            const [description, ...givenToUsersNames] = values.reverse();
+            const fromUser = await this.userService.findByName(body.user_name);
+            const givenToUsers = await this.userService.findByUsersName(givenToUsersNames);
+
+            if (!givenToUsers || !fromUser) {
                 this.slackService.responseInvalidUsername(body.response_url, timeWhenResponseUrlIsAvailable)
             } else {
-                await this.kudosService.saveKudos({description: description, from: body.user_name, user: givenToUser})
+                await this.kudosService.saveKudos(description, fromUser, givenToUsers)
                 this.slackService.responseOk(body.response_url, timeWhenResponseUrlIsAvailable);
             }
         }
-
-        console.log('body')
-        console.log(body)
-        console.log(body.trigger_id)
 
         return {text: '✅ Thanks for submitting Kudos!'}
     }
@@ -108,18 +104,19 @@ export class KudosController {
                 this.slackService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable)
                 return;
             }
-            const user = await this.userService.findUserBySlackId(payloadBody.submission.kudos_given)
+            const givenToUser = await this.userService.findUserBySlackId(payloadBody.submission.kudos_given)
+            const fromUser = await this.userService.findByName(payloadBody.user.name);
 
-            if (!user) {
+            if (!givenToUser || !fromUser) {
                 this.slackService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable)
                 return;
             }
 
-            await this.kudosService.saveKudos({
-                description: payloadBody.submission.description,
-                from: payloadBody.user.name,
-                user: user.name
-            })
+            await this.kudosService.saveKudos(
+                payloadBody.submission.description,
+                fromUser,
+                [givenToUser]
+            )
             this.slackService.responseOk(payloadBody.response_url, timeWhenResponseUrlIsAvailable);
         }
     }

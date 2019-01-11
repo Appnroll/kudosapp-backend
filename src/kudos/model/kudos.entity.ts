@@ -1,15 +1,24 @@
-import {Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {
+    Column,
+    CreateDateColumn,
+    Entity,
+    JoinColumn,
+    JoinTable,
+    ManyToMany,
+    OneToOne,
+    PrimaryGeneratedColumn,
+    UpdateDateColumn
+} from "typeorm";
+import {User} from "./user.entity";
 
 @Entity()
 export class Kudos {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    givenTo: string;
-
-    @Column()
-    from: string;
+    @OneToOne(type => User)
+    @JoinColumn()
+    from: User;
 
     @Column('text')
     description: string;
@@ -19,4 +28,8 @@ export class Kudos {
 
     @UpdateDateColumn({type: 'date'})
     updatedAt: Date;
+
+    @ManyToMany(type => User)
+    @JoinTable()
+    users: User[];
 }
