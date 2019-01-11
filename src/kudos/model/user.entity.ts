@@ -9,6 +9,9 @@ export class User {
     name: string;
 
     @Column()
+    slackId: string;
+
+    @Column()
     image_24: string
 
     @Column()

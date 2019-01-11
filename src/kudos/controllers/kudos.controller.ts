@@ -7,12 +7,16 @@ import {KudosFromDto} from "../dto/kudos-from.dto";
 import {KudosGivenDto} from "../dto/kudos-given.dto";
 import {PostSlackDto} from "../dto/post-slack.dto";
 import {UserService} from "../services/user.service";
+import {DialogPostSlackDto} from "../dto/dialog-post-slack.dto";
+import {SlackService} from "../services/slack.service";
+import {SingleKudosSlackDto} from "../dto/single-kudos-slack.dto";
 
 @Controller('kudos')
 export class KudosController {
 
     constructor(private kudosService: KudosService,
                 private userService: UserService,
+                private slackService: SlackService,
                 private httpService: HttpService) {
     }
 
@@ -50,43 +54,24 @@ export class KudosController {
         return {id: kudo.id, from: kudo.from, givenTo: kudo.givenTo, description: kudo.description}
     }
 
-    @Post('slack')
+    @Post('multikudos')
     @HttpCode(201)
-    async postSlack(@Body() body: PostSlackDto): Promise<{ text: string }> {
-
-        console.log(body)
-
+    async postSlack(@Body() body: PostSlackDto & DialogPostSlackDto): Promise<{ text: string }> {
         const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
         const validToken = process.env.SLACK_TOKEN || 'hDa8MTD79bTgTpfAQ8W6cWc4'
 
         if (validToken !== body.token) {
-            console.log('invalid')
-            this.kudosService.delayedSlackResponse(body.response_url, timeWhenResponseUrlIsAvailable, {
-                "text": "Ooups, something went wrong!",
-                "response_type": "ephemeral",
-                "attachments": [
-                    {
-                        "text": "Ask your Slack Admin for more details - Auth issue!"
-                    }
-                ]
-            })
-            return;
+            this.slackService.responseInvalidToken(body.response_url, timeWhenResponseUrlIsAvailable)
         } else {
             const values = body.text.split(';')
             const givenToUser = values[0]
-            const description = values[1]
+            const [description, ...users] = values.reverse();
             const userExist = await this.userService.checkIfUserExist(givenToUser);
             if (!userExist) {
-                this.kudosService.delayedSlackResponse(body.response_url, timeWhenResponseUrlIsAvailable, {
-                    "text": "User does not exist, please check name!",
-                    "response_type": "ephemeral"
-                })
+                this.slackService.responseInvalidUsername(body.response_url, timeWhenResponseUrlIsAvailable)
             } else {
                 await this.kudosService.saveKudos({description: description, from: body.user_name, user: givenToUser})
-                this.kudosService.delayedSlackResponse(body.response_url, timeWhenResponseUrlIsAvailable, {
-                    "response_type": "ephemeral",
-                    "text": "Kudos awarded successfully 👑"
-                })
+                this.slackService.responseOk(body.response_url, timeWhenResponseUrlIsAvailable);
             }
         }
 
@@ -94,41 +79,52 @@ export class KudosController {
         console.log(body)
         console.log(body.trigger_id)
 
-        const headersRequest = {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
-        };
-
-        const req: any = await this.httpService
-            .post(`https://slack.com/api/dialog.open`,
-                {
-                    "trigger_id": `${body.trigger_id}`,
-                    "dialog": {
-                        "callback_id": `kudos-${Math.random().toString(36).substring(7)}`,
-                        "title": "Request a Ride",
-                        "submit_label": "Request",
-                        "notify_on_cancel": true,
-                        "state": "Limo",
-                        "elements": [
-                            {
-                                "label": "Give kudos to:",
-                                "name": "kudos_given",
-                                "type": "select",
-                                "data_source": "users"
-                            },
-                            {
-                                "label": "Description",
-                                "name": "description",
-                                "type": "textarea",
-                                "hint": "Give short kudo description!"
-                            }
-                        ]
-                    }
-                }, {headers: headersRequest}).toPromise()
-
-        console.log(req.body);
-        console.log(req.data);
-
         return {text: '✅ Thanks for submitting Kudos!'}
+    }
+
+    @Post('singleKudos')
+    @HttpCode(201)
+    async singleKudo(@Body() body: SingleKudosSlackDto): Promise<void> {
+        const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
+        const validToken = process.env.SLACK_TOKEN || 'hDa8MTD79bTgTpfAQ8W6cWc4'
+        if (validToken !== body.token) {
+            this.slackService.responseInvalidToken(body.response_url, timeWhenResponseUrlIsAvailable)
+        } else {
+            await this.slackService.openSlackDialog(body.trigger_id)
+        }
+    }
+
+    @Post('slack')
+    @HttpCode(201)
+    async saveSingleKudo(@Body() body: DialogPostSlackDto): Promise<void> {
+
+        console.log('in slack save single kudo')
+        console.log(body)
+
+        const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
+        const validToken = process.env.SLACK_TOKEN || 'hDa8MTD79bTgTpfAQ8W6cWc4'
+        if (validToken !== body.payload.token) {
+            console.log('invalid token')
+            this.slackService.responseInvalidToken(body.payload.response_url, timeWhenResponseUrlIsAvailable)
+        } else {
+            if (!body.payload.submission.kudos_given) {
+                this.slackService.responseInvalidUsername(body.payload.response_url, timeWhenResponseUrlIsAvailable)
+                return;
+            }
+            const user = await this.userService.findUserBySlackId(body.payload.submission.kudos_given)
+            if (!user) {
+                this.slackService.responseInvalidUsername(body.payload.response_url, timeWhenResponseUrlIsAvailable)
+                return;
+            }
+
+            console.log('saving kudo')
+
+            await this.kudosService.saveKudos({
+                description: body.payload.submission.description,
+                from: body.payload.user.name,
+                user: user.name
+            })
+            this.slackService.responseOk(body.payload.response_url, timeWhenResponseUrlIsAvailable);
+        }
     }
 }

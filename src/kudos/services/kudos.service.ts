@@ -95,16 +95,4 @@ export class KudosService {
         kudo.givenTo = kudosData.user
         return await this.kudosRepository.save(kudo);
     }
-
-    delayedSlackResponse(url: string, timeWhenResponseUrlIsAvailable: number, reason: {}) {
-        setTimeout(
-            () => (
-                this.httpService.post(url, reason, {headers: {'content-type': 'application/json'}})
-                    .toPromise()
-                    .then()
-                    .catch(console.log)
-            ),
-            Math.max(timeWhenResponseUrlIsAvailable - new Date().getTime(), 0)
-        )
-    }
 }

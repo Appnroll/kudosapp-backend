@@ -17,6 +17,10 @@ export class UserService {
         return await this.userRepository.findOne({name: username})
     }
 
+    async findUserBySlackId(slackId: string) {
+        return await this.userRepository.findOne({slackId: slackId});
+    }
+
     async getAll(): Promise<User[]> {
         return await this.userRepository.find();
     }
