@@ -111,14 +111,16 @@ export class KudosController {
                         "state": "Limo",
                         "elements": [
                             {
-                                "type": "text",
-                                "label": "Pickup Location",
-                                "name": "loc_origin"
+                                "label": "Give kudos to:",
+                                "name": "kudos_given",
+                                "type": "select",
+                                "data_source": "users"
                             },
                             {
-                                "type": "text",
-                                "label": "Dropoff Location",
-                                "name": "loc_destination"
+                                "label": "Description",
+                                "name": "description",
+                                "type": "textarea",
+                                "hint": "Give short kudo description!"
                             }
                         ]
                     }
