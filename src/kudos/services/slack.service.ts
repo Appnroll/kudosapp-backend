@@ -76,15 +76,16 @@ export class SlackService {
 
     responseOk(responseUrl, timeWhenResponseUrlIsAvailable) {
         this.delayedSlackResponse(responseUrl, timeWhenResponseUrlIsAvailable, {
-            "text": "User does not exist, please check name!",
+            "text": "Kudos awarded successfully 👑",
             "response_type": "ephemeral"
+
         })
     }
 
     responseInvalidUsername(responseUrl, timeWhenResponseUrlIsAvailable) {
         this.delayedSlackResponse(responseUrl, timeWhenResponseUrlIsAvailable, {
             "response_type": "ephemeral",
-            "text": "Kudos awarded successfully 👑"
+            "text": "User does not exist, please check name|names!"
         })
     }
 

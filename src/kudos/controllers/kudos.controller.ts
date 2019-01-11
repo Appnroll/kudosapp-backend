@@ -97,18 +97,11 @@ export class KudosController {
     @Post('slack')
     @HttpCode(201)
     async saveSingleKudo(@Body() body: DialogPostSlackDto): Promise<void> {
-
-        console.log('in slack save single kudo')
-        console.log(body)
-
         const payloadBody = JSON.parse(body.payload);
-
-        console.log(payloadBody)
-
         const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
         const validToken = process.env.SLACK_TOKEN || 'hDa8MTD79bTgTpfAQ8W6cWc4'
+
         if (validToken !== payloadBody.token) {
-            console.log('invalid token')
             this.slackService.responseInvalidToken(payloadBody.response_url, timeWhenResponseUrlIsAvailable)
         } else {
             if (!payloadBody.submission.kudos_given) {
@@ -116,12 +109,11 @@ export class KudosController {
                 return;
             }
             const user = await this.userService.findUserBySlackId(payloadBody.submission.kudos_given)
+
             if (!user) {
                 this.slackService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable)
                 return;
             }
-
-            console.log('saving kudo')
 
             await this.kudosService.saveKudos({
                 description: payloadBody.submission.description,
