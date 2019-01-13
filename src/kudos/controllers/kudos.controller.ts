@@ -21,7 +21,7 @@ export class KudosController {
 
     @Get()
     async getKudos(): Promise<KudosDto[]> {
-        // return await this.kudosService.getAllWithAvatars();
+        return await this.kudosService.getAllWithAvatars();
         return []
     }
 
