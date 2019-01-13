@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpCode, Post} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, Post, UseGuards} from '@nestjs/common';
 import {KudosService} from "../services/kudos.service";
 import {KudosDto} from "../dto/kudos.dto";
 import {KudosRankingDto} from "../dto/kudos-ranking.dto";
@@ -9,6 +9,7 @@ import {UserService} from "../services/user.service";
 import {DialogPostSlackDto} from "../dto/dialog-post-slack.dto";
 import {SlackService} from "../services/slack.service";
 import {SingleKudosSlackDto} from "../dto/single-kudos-slack.dto";
+import {SlackTokenGuard} from "../guards/slackToken.guard";
 
 @Controller('kudos')
 export class KudosController {
@@ -43,81 +44,60 @@ export class KudosController {
         return kudos.map(el => ({quantity: Number(el.quantity), year: el.year, givenTo: el.givenTo, month: el.month}));
     }
 
-    // @Post()
-    // @HttpCode(201)
-    // async postKudos(@Body() body: PostKudosDto): Promise<KudosDto> {
-    //     if (!body.description || !body.from || !body.user) {
-    //         throw new HttpException('Wrong input', HttpStatus.BAD_REQUEST)
-    //     }
-    //     const kudo = await this.kudosService.saveKudos(body)
-    //     return {id: kudo.id, from: kudo.from, givenTo: kudo.givenTo, description: kudo.description}
-    // }
-
-    @Post('multikudos')
+    @Post('multiKudos')
     @HttpCode(201)
+    @UseGuards(SlackTokenGuard)
     async postSlack(@Body() body: PostSlackDto): Promise<{ text: string }> {
         const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
-        const validToken = process.env.SLACK_TOKEN || 'hDa8MTD79bTgTpfAQ8W6cWc4'
+        const [usersString, description] = body.text.split(';')
+        const givenToUsersNames = usersString.replace(/\s+/g, " ").trim().split(' ');
 
-        if (validToken !== body.token) {
-            this.slackService.responseInvalidToken(body.response_url, timeWhenResponseUrlIsAvailable)
+        const fromUser = await this.userService.findByName(body.user_name);
+        const givenToUsers = await this.userService.findByUsersName(givenToUsersNames);
+
+        if (!givenToUsers || givenToUsers.length === 0 || !fromUser) {
+            this.slackService.responseInvalidUsername(body.response_url, timeWhenResponseUrlIsAvailable)
         } else {
-            const values = body.text.split(';')
-            const [description, ...givenToUsersNames] = values.reverse();
-            const fromUser = await this.userService.findByName(body.user_name);
-            const givenToUsers = await this.userService.findByUsersName(givenToUsersNames);
-
-            if (!givenToUsers || !fromUser) {
-                this.slackService.responseInvalidUsername(body.response_url, timeWhenResponseUrlIsAvailable)
-            } else {
-                await this.kudosService.saveKudos(description, fromUser, givenToUsers)
-                this.slackService.responseOk(body.response_url, timeWhenResponseUrlIsAvailable);
-            }
+            await this.kudosService.saveKudos(description, fromUser, givenToUsers)
+            this.slackService.responseOk(body.response_url, timeWhenResponseUrlIsAvailable);
         }
+
 
         return {text: '✅ Thanks for submitting Kudos!'}
     }
 
     @Post('singleKudos')
     @HttpCode(201)
+    @UseGuards(SlackTokenGuard)
     async singleKudo(@Body() body: SingleKudosSlackDto): Promise<void> {
-        const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
-        const validToken = process.env.SLACK_TOKEN || 'hDa8MTD79bTgTpfAQ8W6cWc4'
-        if (validToken !== body.token) {
-            this.slackService.responseInvalidToken(body.response_url, timeWhenResponseUrlIsAvailable)
-        } else {
-            await this.slackService.openSlackDialog(body.trigger_id)
-        }
+        await this.slackService.openSlackDialog(body.trigger_id)
     }
 
     @Post('slack')
     @HttpCode(201)
+    @UseGuards(SlackTokenGuard)
     async saveSingleKudo(@Body() body: DialogPostSlackDto): Promise<void> {
         const payloadBody = JSON.parse(body.payload);
         const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
-        const validToken = process.env.SLACK_TOKEN || 'hDa8MTD79bTgTpfAQ8W6cWc4'
 
-        if (validToken !== payloadBody.token) {
-            this.slackService.responseInvalidToken(payloadBody.response_url, timeWhenResponseUrlIsAvailable)
-        } else {
-            if (!payloadBody.submission.kudos_given) {
-                this.slackService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable)
-                return;
-            }
-            const givenToUser = await this.userService.findUserBySlackId(payloadBody.submission.kudos_given)
-            const fromUser = await this.userService.findByName(payloadBody.user.name);
-
-            if (!givenToUser || !fromUser) {
-                this.slackService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable)
-                return;
-            }
-
-            await this.kudosService.saveKudos(
-                payloadBody.submission.description,
-                fromUser,
-                [givenToUser]
-            )
-            this.slackService.responseOk(payloadBody.response_url, timeWhenResponseUrlIsAvailable);
+        if (!payloadBody.submission.kudos_given) {
+            this.slackService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable)
+            return;
         }
+        const givenToUser = await this.userService.findUserBySlackId(payloadBody.submission.kudos_given)
+        const fromUser = await this.userService.findByName(payloadBody.user.name);
+
+        if (!givenToUser || !fromUser) {
+            this.slackService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable)
+            return;
+        }
+
+        await this.kudosService.saveKudos(
+            payloadBody.submission.description,
+            fromUser,
+            [givenToUser]
+        )
+        this.slackService.responseOk(payloadBody.response_url, timeWhenResponseUrlIsAvailable);
     }
+
 }

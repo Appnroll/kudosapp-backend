@@ -7,9 +7,10 @@ import {User} from "./model/user.entity";
 import {SlackController} from './controllers/slack.controller';
 import {SlackService} from './services/slack.service';
 import {UserService} from './services/user.service';
+import {UserKudosEntity} from "./model/user-kudos.entity";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Kudos, User]), HttpModule],
+    imports: [TypeOrmModule.forFeature([Kudos, User, UserKudosEntity]), HttpModule],
     controllers: [KudosController, SlackController],
     providers: [KudosService, SlackService, UserService]
 })

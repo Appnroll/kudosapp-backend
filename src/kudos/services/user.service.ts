@@ -9,20 +9,12 @@ export class UserService {
     constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {
     }
 
-    async checkIfUserExist(username: string) {
-        const hasAt = username.indexOf('\@')
-        if (hasAt >= 0) {
-            username = username.substring(1);
-        }
-        return await this.userRepository.findOne({name: username})
-    }
-
     async findUserBySlackId(slackId: string) {
         return await this.userRepository.findOne({slackId: slackId});
     }
 
     async findByName(name: string) {
-        return await this.userRepository.findOne({name: name});
+        return await this.userRepository.findOne({name: name.charAt(0) === '@' ? name.substring(1) : name});
     }
 
     async findBy(findOneOptions: FindConditions<User>) {
@@ -32,7 +24,7 @@ export class UserService {
     async findByUsersName(users: string[]) {
         return await this.userRepository.find({
             where: {
-                name: In(users)
+                name: In(this.removeUnnecessaryAt(users))
             }
         })
     }
@@ -40,4 +32,12 @@ export class UserService {
     async getAll(): Promise<User[]> {
         return await this.userRepository.find();
     }
+
+    removeUnnecessaryAt(usersNames: string[]) {
+        return usersNames.map(el => {
+            return el.charAt(0) === `@` ? el.substring(1) : el;
+        })
+    }
+
+
 }

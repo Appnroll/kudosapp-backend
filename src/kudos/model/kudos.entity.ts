@@ -2,23 +2,16 @@ import {
     Column,
     CreateDateColumn,
     Entity,
-    JoinColumn,
-    JoinTable,
-    ManyToMany,
-    OneToOne,
+    OneToMany,
     PrimaryGeneratedColumn,
     UpdateDateColumn
 } from "typeorm";
-import {User} from "./user.entity";
+import {UserKudosEntity} from "./user-kudos.entity";
 
 @Entity()
 export class Kudos {
     @PrimaryGeneratedColumn()
     id: number;
-
-    @OneToOne(type => User)
-    @JoinColumn()
-    from: User;
 
     @Column('text')
     description: string;
@@ -29,7 +22,6 @@ export class Kudos {
     @UpdateDateColumn({type: 'date'})
     updatedAt: Date;
 
-    @ManyToMany(type => User)
-    @JoinTable()
-    users: User[];
+    @OneToMany(type => UserKudosEntity, userKudos => userKudos.kudos)
+    userKudos: UserKudosEntity[];
 }

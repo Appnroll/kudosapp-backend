@@ -12,7 +12,7 @@ export class SlackService {
     }
 
     async fetchAvatars() {
-        const req: any = await this.httpService.get(`https://slack.com/api/users.list?token=${process.env.SLACK_OAUTH_TOKEN}`).toPromise()
+        const req: any = await this.httpService.get(`https://slack.com/api/users.list?token=xoxp-9591341856-9593457634-518884919123-9960af5034e075838cdee605e8291287`).toPromise()
         const users = req.data.members.map(el => ({
             name: el.name,
             slackId: el.id,

@@ -3,13 +3,14 @@ import {Kudos} from "../model/kudos.entity";
 import {Repository} from "typeorm";
 import {InjectRepository} from '@nestjs/typeorm';
 import {UserService} from "./user.service";
-import {AvatarDto} from "../dto/avatar.dto";
 import {User} from "../model/user.entity";
+import {UserKudosEntity} from "../model/user-kudos.entity";
 
 @Injectable()
 export class KudosService {
 
     constructor(@InjectRepository(Kudos) private readonly kudosRepository: Repository<Kudos>,
+                @InjectRepository(UserKudosEntity) private readonly userKudosRepository: Repository<UserKudosEntity>,
                 private readonly userService: UserService) {
     }
 
@@ -88,17 +89,23 @@ export class KudosService {
             .getRawMany();
     }
 
-    async saveKudos(description: string, from: User, users: User[]): Promise<Kudos> {
+    async saveKudos(description: string, from: User, users: User[]): Promise<UserKudosEntity[]> {
         const kudo = this.kudosRepository.create()
-        kudo.description = description
-        kudo.users = [...users]
-        kudo.from = from
-        return await this.kudosRepository.save(kudo);
-    }
+        kudo.description = description;
 
-    removeUnnecesaryAt(usersNames: string[]) {
-        return usersNames.map(el => {
-            return el.charAt(0) === `@` ? el.substring(1) : el;
+        await this.kudosRepository.save(kudo);
+
+        const userKudos = users.map(user => {
+            const userKudos = this.userKudosRepository.create();
+            userKudos.user = user;
+            userKudos.kudos = kudo;
+            userKudos.from = from;
+            return userKudos;
         })
+
+        kudo.userKudos = userKudos;
+        from.userKudos = userKudos;
+
+        return await this.userKudosRepository.save(userKudos);
     }
 }
