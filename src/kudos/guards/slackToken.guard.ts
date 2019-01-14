@@ -12,7 +12,11 @@ export class SlackTokenGuard implements CanActivate {
         const request = context.switchToHttp().getRequest();
         const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
         const validToken = process.env.SLACK_TOKEN || 'hDa8MTD79bTgTpfAQ8W6cWc4'
-        const body = request.body;
+        let body = request.body;
+
+        if(body.payload){
+            body = JSON.parse(body.payload);
+        }
 
         console.log('here');
         console.log(body);
