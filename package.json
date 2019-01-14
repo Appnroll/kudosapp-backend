@@ -26,6 +26,7 @@
   "dependencies": {
     "@nestjs/common": "^5.4.0",
     "@nestjs/core": "^5.4.0",
+    "@nestjs/swagger": "^2.5.1",
     "@nestjs/typeorm": "^5.2.2",
     "@types/joi": "^14.0.1",
     "@types/lodash": "^4.14.119",

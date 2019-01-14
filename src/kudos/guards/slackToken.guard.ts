@@ -18,9 +18,6 @@ export class SlackTokenGuard implements CanActivate {
             body = JSON.parse(body.payload);
         }
 
-        console.log('here');
-        console.log(body);
-
         if (validToken !== body.token && !body.response_url) {
             this.slackService.responseInvalidToken(body.response_url, timeWhenResponseUrlIsAvailable)
             return false;
