@@ -69,6 +69,7 @@ export class KudosController {
     @HttpCode(201)
     @UseGuards(SlackTokenGuard)
     async singleKudo(@Body() body: SingleKudosSlackDto): Promise<void> {
+        console.log(body);
         await this.slackService.openSlackDialog(body.trigger_id)
     }
 
