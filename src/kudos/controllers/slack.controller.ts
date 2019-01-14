@@ -13,7 +13,7 @@ export class SlackController {
     @Get('avatars')
     @HttpCode(200)
     async fetchAvatars() {
-        await this.slackService.fetchAvatars();
+        // await this.slackService.fetchAvatars();
         return {status: 'ok'};
     }
 
