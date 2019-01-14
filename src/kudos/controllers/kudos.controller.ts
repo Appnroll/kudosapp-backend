@@ -80,6 +80,8 @@ export class KudosController {
         const payloadBody = JSON.parse(body.payload);
         const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
 
+        console.log(payloadBody);
+
         if (!payloadBody.submission.kudos_given) {
             this.slackService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable)
             return;
