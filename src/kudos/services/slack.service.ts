@@ -33,7 +33,9 @@ export class SlackService {
             'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
         };
 
-        await this.httpService
+        console.log(process.env.SLACK_OAUTH_TOKEN)
+
+        const req = await this.httpService
             .post(`https://slack.com/api/dialog.open`,
                 {
                     "trigger_id": `${triggerId}`,
@@ -58,6 +60,8 @@ export class SlackService {
                         ]
                     }
                 }, {headers: headersRequest}).toPromise()
+
+        console.log(req.data)
     }
 
 
