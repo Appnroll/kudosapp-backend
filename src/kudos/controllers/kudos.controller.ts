@@ -22,28 +22,28 @@ export class KudosController {
     }
 
     @Get()
-    @ApiResponse({status: 200, description: 'Get all Kudos', type: KudosDto})
+    @ApiResponse({status: 200, description: 'Get all Kudos', type: KudosDto, isArray:true})
     async getKudos(): Promise<KudosDto[]> {
         return await this.kudosService.getAllWithAvatars();
     }
 
 
     @Get('rankings')
-    @ApiResponse({status: 200, description: 'Get overall rankings', type: KudosRankingDto})
+    @ApiResponse({status: 200, description: 'Get overall rankings', type: KudosRankingDto, isArray:true})
     async getRankings(): Promise<KudosRankingDto[]> {
         const kudos = await this.kudosService.getRankings();
         return kudos.map(({name, totalPoints}) => ({name, totalPoints: Number(totalPoints)}));
     }
 
     @Get('from')
-    @ApiResponse({status: 200, description: 'Kudos `from` overall statistics for months/years', type: KudosFromDto})
+    @ApiResponse({status: 200, description: 'Kudos `from` overall statistics for months/years', type: KudosFromDto, isArray:true})
     async kudosFromUsers(): Promise<KudosFromDto[]> {
         const kudos = await this.kudosService.getFrom();
         return kudos.map(({quantity, name, month, year}) => ({quantity: Number(quantity), year, from: name, month}));
     }
 
     @Get('given')
-    @ApiResponse({status: 200, description: 'Kudos `given` overall statistics for months/years', type: KudosGivenDto})
+    @ApiResponse({status: 200, description: 'Kudos `given` overall statistics for months/years', type: KudosGivenDto, isArray:true})
     async kudosGivenToUsers(): Promise<KudosGivenDto[]> {
         const kudos = await this.kudosService.getGiven();
         return kudos.map(({quantity, name, month, year}) => ({quantity: Number(quantity), year, givenTo: name, month}));
