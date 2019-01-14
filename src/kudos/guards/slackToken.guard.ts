@@ -14,6 +14,7 @@ export class SlackTokenGuard implements CanActivate {
         const validToken = process.env.SLACK_TOKEN || 'hDa8MTD79bTgTpfAQ8W6cWc4'
         const body = request.body;
 
+        console.log('here');
         console.log(body);
 
         if (validToken !== body.token && !body.response_url) {

@@ -80,6 +80,7 @@ export class KudosController {
         const payloadBody = JSON.parse(body.payload);
         const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
 
+        console.log('here2232323');
         console.log(payloadBody);
 
         if (!payloadBody.submission.kudos_given) {
