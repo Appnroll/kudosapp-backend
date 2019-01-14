@@ -12,7 +12,7 @@ export class SlackService {
     }
 
     async fetchAvatars() {
-        const req: any = await this.httpService.get(`https://slack.com/api/users.list?token=${SLACK_OAUTH_TOKEN}`).toPromise()
+        const req: any = await this.httpService.get(`https://slack.com/api/users.list?token=${process.env.SLACK_OAUTH_TOKEN}`).toPromise()
         const users = req.data.members.map(el => ({
             name: el.name,
             slackId: el.id,
@@ -23,7 +23,6 @@ export class SlackService {
             image_192: el.profile.image_192
         }))
         const usersEntities = this.userRepository.create(users)
-        await this.userRepository.clear();
         await this.userRepository.save(usersEntities)
     }
 

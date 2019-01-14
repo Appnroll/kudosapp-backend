@@ -1,6 +1,5 @@
 import {Body, Controller, Get, HttpCode, Post, UseGuards} from '@nestjs/common';
 import {KudosService} from "../services/kudos.service";
-import {KudosDto} from "../dto/kudos.dto";
 import {KudosRankingDto} from "../dto/kudos-ranking.dto";
 import {KudosFromDto} from "../dto/kudos-from.dto";
 import {KudosGivenDto} from "../dto/kudos-given.dto";
@@ -10,6 +9,7 @@ import {DialogPostSlackDto} from "../dto/dialog-post-slack.dto";
 import {SlackService} from "../services/slack.service";
 import {SingleKudosSlackDto} from "../dto/single-kudos-slack.dto";
 import {SlackTokenGuard} from "../guards/slackToken.guard";
+import {KudosDto} from "../dto/kudos.dto";
 
 @Controller('kudos')
 export class KudosController {
@@ -22,26 +22,25 @@ export class KudosController {
     @Get()
     async getKudos(): Promise<KudosDto[]> {
         return await this.kudosService.getAllWithAvatars();
-        return []
     }
 
 
     @Get('rankings')
     async getRankings(): Promise<KudosRankingDto[]> {
         const kudos = await this.kudosService.getRankings();
-        return kudos.map(el => ({name: el.givenTo, totalPoints: el.totalPoints}));
+        return kudos.map(({name, totalPoints}) => ({name, totalPoints: Number(totalPoints)}));
     }
 
     @Get('from')
     async kudosFromUsers(): Promise<KudosFromDto[]> {
         const kudos = await this.kudosService.getFrom();
-        return kudos.map(el => ({quantity: Number(el.quantity), year: el.year, from: el.from, month: el.month}));
+        return kudos.map(({quantity, name, month, year}) => ({quantity: Number(quantity), year, from: name, month}));
     }
 
     @Get('given')
     async kudosGivenToUsers(): Promise<KudosGivenDto[]> {
         const kudos = await this.kudosService.getGiven();
-        return kudos.map(el => ({quantity: Number(el.quantity), year: el.year, givenTo: el.givenTo, month: el.month}));
+        return kudos.map(({quantity, name, month, year}) => ({quantity: Number(quantity), year, givenTo: name, month}));
     }
 
     @Post('multiKudos')

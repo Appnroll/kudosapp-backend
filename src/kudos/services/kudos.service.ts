@@ -2,104 +2,90 @@ import {Injectable} from '@nestjs/common';
 import {Kudos} from "../model/kudos.entity";
 import {Repository} from "typeorm";
 import {InjectRepository} from '@nestjs/typeorm';
-import {UserService} from "./user.service";
 import {User} from "../model/user.entity";
 import {UserKudosEntity} from "../model/user-kudos.entity";
+import {groupBy, map} from "lodash";
+import {AvatarDto} from "../dto/avatar.dto";
 
 @Injectable()
 export class KudosService {
 
     constructor(@InjectRepository(Kudos) private readonly kudosRepository: Repository<Kudos>,
-                @InjectRepository(UserKudosEntity) private readonly userKudosRepository: Repository<UserKudosEntity>,
-                private readonly userService: UserService) {
-    }
-
-    async getAll(): Promise<Kudos[]> {
-        return await this.kudosRepository.find();
+                @InjectRepository(UserKudosEntity) private readonly userKudosRepository: Repository<UserKudosEntity>) {
     }
 
     async getAllWithAvatars() {
-
         const userKudos = await this.userKudosRepository
             .createQueryBuilder('userKudos')
             .leftJoinAndSelect('userKudos.user', 'users')
             .leftJoinAndSelect('userKudos.kudos', 'kudos')
-            .addSelect("kudos.id")
-            .groupBy(`kudos.id`)
+            .leftJoinAndSelect('userKudos.from', 'fromUser')
             .getRawMany()
 
+        const groupedKudos = groupBy(userKudos, el => el.userKudos_kudosId);
+        const getUserAvatar = (userObj) => ({
+            image_24: userObj.users_image_24,
+            image_32: userObj.users_image_32,
+            image_48: userObj.users_image_48,
+            image_72: userObj.users_image_72,
+            image_192: userObj.users_image_192
+        } as AvatarDto)
 
-        console.log(userKudos);
-
-        // const kudos = await this.getAll();
-        // const users = await this.userService.getAll();
-        // return kudos.map((r: Kudos) => {
-        //     const fromUser = users.find(el => el.name === r.from || r.from === `@${el.name}`)
-        //     const givenToUser = users.find(el => el.name === r.givenTo || r.givenTo === `@${el.name}`)
-        //     let fromAvatar: AvatarDto, givenToAvatar: AvatarDto;
-        //     if (fromUser) {
-        //         fromAvatar = {
-        //             image_24: fromUser.image_24,
-        //             image_32: fromUser.image_32,
-        //             image_48: fromUser.image_48,
-        //             image_72: fromUser.image_72,
-        //             image_192: fromUser.image_192
-        //         }
-        //     }
-        //
-        //     if (givenToUser) {
-        //         givenToAvatar = {
-        //             image_24: givenToUser.image_24,
-        //             image_32: givenToUser.image_32,
-        //             image_48: givenToUser.image_48,
-        //             image_72: givenToUser.image_72,
-        //             image_192: givenToUser.image_192
-        //         }
-        //     }
-        //     return {
-        //         id: r.id,
-        //         from: r.from,
-        //         givenTo: r.givenTo,
-        //         description: r.description,
-        //         fromAvatar: fromAvatar,
-        //         givenToAvatar: givenToAvatar
-        //     }
-        // })
-
-        return []
+        return map(groupedKudos, (value) => {
+            const kudosProperties = value[0]
+            return {
+                description: kudosProperties.kudos_description,
+                from: kudosProperties.fromUser_name,
+                id: kudosProperties.kudos_id,
+                givenTo: value.map(val => val.users_name),
+                fromAvatar: {
+                    image_24: kudosProperties.fromUser_image_24,
+                    image_32: kudosProperties.fromUser_image_32,
+                    image_48: kudosProperties.fromUser_image_48,
+                    image_72: kudosProperties.fromUser_image_72,
+                    image_192: kudosProperties.fromUser_image_192
+                } as AvatarDto,
+                givenToAvatar: value.map(getUserAvatar)
+            }
+        })
     }
 
-    async getRankings(): Promise<{ givenTo: string, totalPoints: number }[]> {
-        return await this.kudosRepository.createQueryBuilder("Kudos")
+    async getRankings(): Promise<{ totalPoints: number, name: string }[]> {
+        return await this.userKudosRepository.createQueryBuilder("userKudos")
             .select('COUNT(*)', 'totalPoints')
-            .addSelect(['\"givenTo\"'])
-            .addGroupBy('\"givenTo\"')
+            .leftJoin('userKudos.user', 'users')
+            .addSelect([`"userKudos"."userId"`])
+            .addSelect([`"users"."name"`])
+            .addGroupBy(`"userKudos"."userId"`)
+            .addGroupBy(`"users"."name"`)
             .getRawMany();
     }
 
-    async getFrom(): Promise<{ quantity: number, year: number, month: string, from: string }[]> {
-        return await this.kudosRepository.createQueryBuilder("Kudos")
+    async getFrom(): Promise<{ quantity: number, year: number, month: string, name: string }[]> {
+        return await this.userKudosRepository.createQueryBuilder("userKudos")
             .select('COUNT(*)', 'quantity')
-            .addSelect(`extract(year from "createdAt")`, 'year')
-            .addSelect(`to_char("createdAt", 'Mon')`, 'month')
-            .addSelect([`"from"`])
-            .addGroupBy(`"from"`)
+            .leftJoin('userKudos.from', 'users')
+            .addSelect(`extract(year from "userKudos"."createdAt")`, 'year')
+            .addSelect(`to_char("userKudos"."createdAt", 'Mon')`, 'month')
+            .addSelect([`"users"."name"`])
+            .addGroupBy(`"users"."name"`)
             .addGroupBy('month')
             .addGroupBy('year')
-            .addOrderBy(`"from"`, "ASC")
+            .addOrderBy(`"users"."name"`, "ASC")
             .getRawMany();
     }
 
-    async getGiven(): Promise<{ quantity: number, year: number, month: string, givenTo: string }[]> {
-        return await this.kudosRepository.createQueryBuilder("Kudos")
+    async getGiven(): Promise<{ quantity: number, year: number, month: string, name: string }[]> {
+        return await this.userKudosRepository.createQueryBuilder("userKudos")
             .select('COUNT(*)', 'quantity')
-            .addSelect(`extract(year from "createdAt")`, 'year')
-            .addSelect(`to_char("createdAt", 'Mon')`, 'month')
-            .addSelect([`"givenTo"`])
-            .addGroupBy(`"givenTo"`)
+            .leftJoin('userKudos.user', 'users')
+            .addSelect(`extract(year from "userKudos"."createdAt")`, 'year')
+            .addSelect(`to_char("userKudos"."createdAt", 'Mon')`, 'month')
+            .addSelect([`"users"."name"`])
+            .addGroupBy(`"users"."name"`)
             .addGroupBy('month')
             .addGroupBy('year')
-            .addOrderBy(`"givenTo"`, "ASC")
+            .addOrderBy(`"users"."name"`, "ASC")
             .getRawMany();
     }
 
