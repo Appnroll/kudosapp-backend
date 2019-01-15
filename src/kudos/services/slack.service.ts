@@ -33,8 +33,6 @@ export class SlackService {
             'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
         };
 
-        console.log(process.env.SLACK_OAUTH_TOKEN)
-
         const req = await this.httpService
             .post(`https://slack.com/api/dialog.open`,
                 {
@@ -60,8 +58,6 @@ export class SlackService {
                         ]
                     }
                 }, {headers: headersRequest}).toPromise()
-
-        console.log(req.data)
     }
 
 

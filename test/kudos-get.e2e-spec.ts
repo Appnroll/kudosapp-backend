@@ -6,10 +6,15 @@ import {Repository} from "typeorm";
 import {Kudos} from "../src/kudos/model/kudos.entity";
 import {getRepositoryToken, TypeOrmModule} from '@nestjs/typeorm';
 import {TypeOrmConfigTestService} from "../src/config/type-orm-config-test.service";
+import {seedDefaultData} from "./data.seeds";
+import {UserKudosEntity} from "../src/kudos/model/user-kudos.entity";
+import {User} from "../src/kudos/model/user.entity";
 
 describe('Kudos (e2e)', () => {
     let app: INestApplication;
     let kudosRepository: Repository<Kudos>;
+    let userKudosEntityRepository: Repository<UserKudosEntity>;
+    let userRepository: Repository<User>;
 
     beforeAll(async () => {
         const moduleFixture = await Test.createTestingModule({
@@ -23,30 +28,20 @@ describe('Kudos (e2e)', () => {
 
         app = moduleFixture.createNestApplication();
         kudosRepository = moduleFixture.get<Repository<Kudos>>(getRepositoryToken(Kudos));
-        await kudosRepository.clear();
+        userKudosEntityRepository = moduleFixture.get<Repository<UserKudosEntity>>(getRepositoryToken(UserKudosEntity));
+        userRepository = moduleFixture.get<Repository<User>>(getRepositoryToken(User));
         await app.init();
     });
 
-    afterAll(async () => {
-        await kudosRepository.clear();
-    })
-
     describe('(GET) / ', () => {
         beforeEach(async () => {
-            const exp = [...Array(5).keys()].map(el => kudosRepository.create({
-                id: el + 1,
-                description: `${el} desc`,
-                givenTo: `${el} dota`,
-                from: `dota`,
-                createdAt: new Date(),
-                updatedAt: new Date()
-            }));
-
-            await kudosRepository.save(exp);
+            await seedDefaultData(kudosRepository, userKudosEntityRepository, userRepository);
         });
 
         afterEach(async () => {
-            await kudosRepository.clear();
+            await userKudosEntityRepository.delete({});
+            await kudosRepository.delete({});
+            await userRepository.delete({});
         });
 
         it('should be successful', () => {
