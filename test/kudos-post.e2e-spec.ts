@@ -6,16 +6,20 @@ import {Repository} from "typeorm";
 import {Kudos} from "../src/kudos/model/kudos.entity";
 import {getRepositoryToken, TypeOrmModule} from '@nestjs/typeorm';
 import {TypeOrmConfigTestService} from "../src/config/type-orm-config-test.service";
-import {PostKudosDto} from "../src/kudos/dto/post-kudos.dto";
-import {KudosDto} from "../src/kudos/dto/kudos.dto";
 import {UserKudosEntity} from "../src/kudos/model/user-kudos.entity";
 import {User} from "../src/kudos/model/user.entity";
+import {DialogPostSlackDto, PayloadClass} from "../src/kudos/dto/dialog-post-slack.dto";
+import {SlackService} from "../src/kudos/services/slack.service";
+import {seedDefaultData} from "./data.seeds";
 
 describe('Kudos (e2e)', () => {
     let app: INestApplication;
     let kudosRepository: Repository<Kudos>;
     let userKudosEntityRepository: Repository<UserKudosEntity>;
     let userRepository: Repository<User>;
+    let slackService: SlackService;
+    let responseOkSpy;
+    let responseInvalidUserSpy;
 
     beforeAll(async () => {
         const moduleFixture = await Test.createTestingModule({
@@ -31,63 +35,72 @@ describe('Kudos (e2e)', () => {
         kudosRepository = moduleFixture.get<Repository<Kudos>>(getRepositoryToken(Kudos));
         userKudosEntityRepository = moduleFixture.get<Repository<UserKudosEntity>>(getRepositoryToken(UserKudosEntity));
         userRepository = moduleFixture.get<Repository<User>>(getRepositoryToken(User));
+
+        slackService = moduleFixture.get<SlackService>(SlackService)
+        responseOkSpy = jest.spyOn(slackService, 'responseOk')
+        responseInvalidUserSpy = jest.spyOn(slackService, 'responseInvalidUsername')
         await app.init();
     });
 
-    afterAll(async () => {
-        await kudosRepository.clear();
-    })
+    describe('(POST) /slack ', () => {
+        beforeEach(async () => {
+            await seedDefaultData(kudosRepository, userKudosEntityRepository, userRepository);
+        });
 
-    describe('(POST) /kudos ', () => {
-
-        const postDto = {user: 'dota', from: 'dota allstars', description: 'for refactor'} as PostKudosDto;
+        const postDto = {
+            payload: JSON.stringify({
+                response_url: 'response_url',
+                submission: {description: 'descr', kudos_given: 'slack-id1'},
+                token: 'token',
+                user: {id: 'id', name: 'name1'}
+            } as PayloadClass)
+        } as DialogPostSlackDto;
 
         afterEach(async () => {
-            await kudosRepository.clear();
+            await userKudosEntityRepository.delete({});
+            await kudosRepository.delete({});
+            await userRepository.delete({});
         });
 
-        it('should be successful', () => {
+        it('should be successful and call responseOk method', () => {
             return request(app.getHttpServer())
-                .post('/kudos')
-                .send(postDto)
-                .expect(201)
-        });
-
-        it('should return kudo data', () => {
-            const response = {
-                description: postDto.description,
-                from: postDto.from,
-                givenTo: postDto.user,
-                id: expect.any(Number)
-            } as KudosDto
-
-            return request(app.getHttpServer())
-                .post('/kudos')
+                .post('/kudos/slack')
                 .send(postDto)
                 .then(res => {
-                    expect(res.body).toMatchObject(response);
+                    expect(responseOkSpy).toHaveBeenCalled();
                 })
         });
 
         it('should fail on missing description data', () => {
             return request(app.getHttpServer())
-                .post('/kudos')
-                .send({user: postDto.user, from: postDto.from})
-                .expect(HttpStatus.BAD_REQUEST)
+                .post('/kudos/slack')
+                .send({
+                    payload: JSON.stringify({
+                        response_url: 'response_url',
+                        submission: {description: 'descr', kudos_given: 'wrong_slack_id'},
+                        token: 'token',
+                        user: {id: 'id', name: 'name1'}
+                    } as PayloadClass)
+                })
+                .then(res => {
+                    expect(responseInvalidUserSpy).toHaveBeenCalled();
+                })
         });
 
         it('should fail on missing user data', () => {
             return request(app.getHttpServer())
-                .post('/kudos')
-                .send({description: postDto.description, from: postDto.from})
-                .expect(HttpStatus.BAD_REQUEST)
-        });
-
-        it('should fail on missing from data', () => {
-            return request(app.getHttpServer())
-                .post('/kudos')
-                .send({user: postDto.user, description: postDto.description})
-                .expect(HttpStatus.BAD_REQUEST)
+                .post('/kudos/slack')
+                .send({
+                    payload: JSON.stringify({
+                        response_url: 'response_url',
+                        submission: {description: 'descr', kudos_given: 'slack-id1'},
+                        token: 'token',
+                        user: {id: 'id', name: 'wrong_user_data'}
+                    } as PayloadClass)
+                })
+                .then(res => {
+                    expect(responseInvalidUserSpy).toHaveBeenCalled();
+                })
         });
     })
 });

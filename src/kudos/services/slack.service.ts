@@ -6,7 +6,6 @@ import {InjectRepository} from '@nestjs/typeorm';
 @Injectable()
 export class SlackService {
 
-
     constructor(@InjectRepository(User) private readonly userRepository: Repository<User>,
                 private readonly httpService: HttpService) {
     }

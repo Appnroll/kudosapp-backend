@@ -110,6 +110,7 @@ export class KudosController {
             this.slackService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable)
             return;
         }
+
         const givenToUser = await this.userService.findUserBySlackId(payloadBody.submission.kudos_given)
         const fromUser = await this.userService.findByName(payloadBody.user.name);
 
