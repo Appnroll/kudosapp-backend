@@ -11,6 +11,7 @@ import {SingleKudosSlackDto} from "../dto/single-kudos-slack.dto";
 import {SlackTokenGuard} from "../guards/slackToken.guard";
 import {KudosDto} from "../dto/kudos.dto";
 import {ApiBearerAuth, ApiForbiddenResponse, ApiResponse, ApiUseTags} from '@nestjs/swagger';
+import {AvatarDto} from "../dto/avatar.dto";
 
 @Controller('kudos')
 @ApiUseTags('kudos')
@@ -22,31 +23,63 @@ export class KudosController {
     }
 
     @Get()
-    @ApiResponse({status: 200, description: 'Get all Kudos', type: KudosDto, isArray:true})
+    @ApiResponse({status: 200, description: 'Get all Kudos', type: KudosDto, isArray: true})
     async getKudos(): Promise<KudosDto[]> {
         return await this.kudosService.getAllWithAvatars();
     }
 
-
     @Get('rankings')
-    @ApiResponse({status: 200, description: 'Get overall rankings', type: KudosRankingDto, isArray:true})
+    @ApiResponse({status: 200, description: 'Get overall rankings', type: KudosRankingDto, isArray: true})
     async getRankings(): Promise<KudosRankingDto[]> {
         const kudos = await this.kudosService.getRankings();
-        return kudos.map(({name, totalPoints}) => ({name, totalPoints: Number(totalPoints)}));
+        const users = await this.userService.findByUsersName(kudos.map(el => el.name))
+        return kudos.map(({name, totalPoints}) => ({
+                user: {
+                    name: name,
+                    avatar: this.userService.mapAvatarToAvatarDto(users.find(u => u.name == name))
+                },
+                totalPoints: Number(totalPoints)
+            }
+        ));
     }
 
     @Get('from')
-    @ApiResponse({status: 200, description: 'Kudos `from` overall statistics for months/years', type: KudosFromDto, isArray:true})
+    @ApiResponse({
+        status: 200,
+        description: 'Kudos `from` overall statistics for months/years',
+        type: KudosFromDto,
+        isArray: true
+    })
     async kudosFromUsers(): Promise<KudosFromDto[]> {
         const kudos = await this.kudosService.getFrom();
-        return kudos.map(({quantity, name, month, year}) => ({quantity: Number(quantity), year, from: name, month}));
+        const users = await this.userService.findByUsersName(kudos.map(el => el.name))
+        return kudos.map(({quantity, name, month, year}) =>
+            ({
+                quantity: Number(quantity), year, from: {
+                    name: name,
+                    avatar: this.userService.mapAvatarToAvatarDto(users.find(u => u.name == name))
+                },
+                month
+            }));
     }
 
     @Get('given')
-    @ApiResponse({status: 200, description: 'Kudos `given` overall statistics for months/years', type: KudosGivenDto, isArray:true})
+    @ApiResponse({
+        status: 200,
+        description: 'Kudos `given` overall statistics for months/years',
+        type: KudosGivenDto,
+        isArray: true
+    })
     async kudosGivenToUsers(): Promise<KudosGivenDto[]> {
         const kudos = await this.kudosService.getGiven();
-        return kudos.map(({quantity, name, month, year}) => ({quantity: Number(quantity), year, givenTo: name, month}));
+        const users = await this.userService.findByUsersName(kudos.map(el => el.name))
+        return kudos.map(({quantity, name, month, year}) => ({
+                quantity: Number(quantity), year, givenTo: {
+                    name: name,
+                    avatar: this.userService.mapAvatarToAvatarDto(users.find(u => u.name == name))
+                }, month
+            })
+        );
     }
 
     @Post('multiKudos')

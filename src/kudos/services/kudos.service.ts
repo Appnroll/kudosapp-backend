@@ -35,17 +35,22 @@ export class KudosService {
             const kudosProperties = value[0]
             return {
                 description: kudosProperties.kudos_description,
-                from: kudosProperties.fromUser_name,
+                from: {
+                    avatar: {
+                        image_24: kudosProperties.fromUser_image_24,
+                        image_32: kudosProperties.fromUser_image_32,
+                        image_48: kudosProperties.fromUser_image_48,
+                        image_72: kudosProperties.fromUser_image_72,
+                        image_192: kudosProperties.fromUser_image_192
+                    } as AvatarDto,
+                    name: kudosProperties.fromUser_name
+                },
                 id: kudosProperties.kudos_id,
-                givenTo: value.map(val => val.users_name),
-                fromAvatar: {
-                    image_24: kudosProperties.fromUser_image_24,
-                    image_32: kudosProperties.fromUser_image_32,
-                    image_48: kudosProperties.fromUser_image_48,
-                    image_72: kudosProperties.fromUser_image_72,
-                    image_192: kudosProperties.fromUser_image_192
-                } as AvatarDto,
-                givenToAvatar: value.map(getUserAvatar)
+                givenTo: value.map(val => ({
+                        name: val.users_name,
+                        avatar: getUserAvatar(val)
+                    })
+                )
             }
         })
     }

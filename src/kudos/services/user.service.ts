@@ -2,6 +2,7 @@ import {Injectable} from '@nestjs/common';
 import {User} from "../model/user.entity";
 import {FindConditions, In, Repository} from "typeorm";
 import {InjectRepository} from '@nestjs/typeorm';
+import {AvatarDto} from "../dto/avatar.dto";
 
 @Injectable()
 export class UserService {
@@ -31,6 +32,16 @@ export class UserService {
 
     async getAll(): Promise<User[]> {
         return await this.userRepository.find();
+    }
+
+    mapAvatarToAvatarDto(user: User): AvatarDto {
+        return {
+            image_24: user.image_24,
+            image_32: user.image_32,
+            image_48: user.image_48,
+            image_72: user.image_72,
+            image_192: user.image_192,
+        } as AvatarDto
     }
 
     removeUnnecessaryAt(usersNames: string[]) {

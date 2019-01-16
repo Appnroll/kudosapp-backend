@@ -1,4 +1,5 @@
 import {ApiModelProperty} from "@nestjs/swagger";
+import {UserDto} from "./user.dto";
 
 export class KudosFromDto {
     @ApiModelProperty()
@@ -8,5 +9,5 @@ export class KudosFromDto {
     @ApiModelProperty()
     readonly month: string;
     @ApiModelProperty()
-    readonly from: string;
+    readonly from: UserDto;
 }
