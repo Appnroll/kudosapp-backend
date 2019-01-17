@@ -9,6 +9,7 @@ import {AppModule} from "../src/app.module";
 import {UserKudosEntity} from "../src/kudos/model/user-kudos.entity";
 import {User} from "../src/kudos/model/user.entity";
 import {seedDefaultData} from "./data.seeds";
+import {AvatarDto} from "../src/kudos/dto/avatar.dto";
 
 describe.only('Kudos (e2e)', () => {
     let app: INestApplication;
@@ -40,6 +41,7 @@ describe.only('Kudos (e2e)', () => {
                 .get('/kudos/from')
                 .expect(200)
                 .then(res => {
+                    console.log(res.body);
                     expect(res.body.length).toBe([].length)
                 })
         });
@@ -68,7 +70,16 @@ describe.only('Kudos (e2e)', () => {
                 quantity: 5,
                 year: expect.any(Number),
                 month: expect.any(String),
-                from: 'nameCreator'
+                from: {
+                    name: "nameCreator",
+                    avatar: {
+                        image_24: "",
+                        image_32: "",
+                        image_48: "",
+                        image_72: "",
+                        image_192: "",
+                    } as AvatarDto
+                }
             }]
             return request(app.getHttpServer())
                 .get('/kudos/from')

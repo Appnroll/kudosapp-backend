@@ -10,7 +10,7 @@ export class SlackTokenGuard implements CanActivate {
 
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
         const request = context.switchToHttp().getRequest();
-        const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
+        const timeWhenResponseUrlIsAvailable = this.slackService.getSlackResponseDelay()
         const validToken = process.env.SLACK_TOKEN || 'hDa8MTD79bTgTpfAQ8W6cWc4'
         let body = request.body;
 

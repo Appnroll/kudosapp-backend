@@ -9,6 +9,7 @@ import {AppModule} from "../src/app.module";
 import {UserKudosEntity} from "../src/kudos/model/user-kudos.entity";
 import {User} from "../src/kudos/model/user.entity";
 import {seedDefaultData} from "./data.seeds";
+import {AvatarDto} from "../src/kudos/dto/avatar.dto";
 
 describe('Kudos (e2e)', () => {
     let app: INestApplication;
@@ -68,30 +69,75 @@ describe('Kudos (e2e)', () => {
                     quantity: 1,
                     year: expect.any(Number),
                     month: expect.any(String),
-                    givenTo: 'name0'
+                    givenTo: {
+                        name: "name0",
+                        avatar: {
+                            image_24: "",
+                            image_32: "",
+                            image_48: "",
+                            image_72: "",
+                            image_192: "",
+                        } as AvatarDto
+                    }
                 },
                 {
                     quantity: 1,
                     year: expect.any(Number),
                     month: expect.any(String),
-                    givenTo: 'name1'
+                    givenTo: {
+                        name: "name1",
+                        avatar: {
+                            image_24: "",
+                            image_32: "",
+                            image_48: "",
+                            image_72: "",
+                            image_192: "",
+                        } as AvatarDto
+                    }
                 },
                 {
                     quantity: 1,
                     year: expect.any(Number),
                     month: expect.any(String),
-                    givenTo: 'name2'
+                    givenTo: {
+                        name: "name2",
+                        avatar: {
+                            image_24: "",
+                            image_32: "",
+                            image_48: "",
+                            image_72: "",
+                            image_192: "",
+                        } as AvatarDto
+                    }
                 }, {
                     quantity: 1,
                     year: expect.any(Number),
                     month: expect.any(String),
-                    givenTo: 'name3'
+                    givenTo: {
+                        name: "name3",
+                        avatar: {
+                            image_24: "",
+                            image_32: "",
+                            image_48: "",
+                            image_72: "",
+                            image_192: "",
+                        } as AvatarDto
+                    }
                 },
                 {
                     quantity: 1,
                     year: expect.any(Number),
                     month: expect.any(String),
-                    givenTo: 'name4'
+                    givenTo: {
+                        name: "name4",
+                        avatar: {
+                            image_24: "",
+                            image_32: "",
+                            image_48: "",
+                            image_72: "",
+                            image_192: "",
+                        } as AvatarDto
+                    }
                 }
 
             ]

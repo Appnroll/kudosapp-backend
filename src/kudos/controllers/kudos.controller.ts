@@ -24,8 +24,8 @@ export class KudosController {
 
     @Get()
     @ApiResponse({status: 200, description: 'Get all Kudos', type: KudosDto, isArray: true})
-    async getKudos(): Promise<KudosDto[]> {
-        return await this.kudosService.getAllWithAvatars();
+    getKudos(): Promise<KudosDto[]> {
+        return this.kudosService.getAllWithAvatars();
     }
 
     @Get('rankings')
@@ -36,7 +36,7 @@ export class KudosController {
         return kudos.map(({name, totalPoints}) => ({
                 user: {
                     name: name,
-                    avatar: this.userService.mapAvatarToAvatarDto(users.find(u => u.name == name))
+                    avatar: this.userService.mapAvatarToAvatarDto(name, users)
                 },
                 totalPoints: Number(totalPoints)
             }
@@ -57,7 +57,7 @@ export class KudosController {
             ({
                 quantity: Number(quantity), year, from: {
                     name: name,
-                    avatar: this.userService.mapAvatarToAvatarDto(users.find(u => u.name == name))
+                    avatar: this.userService.mapAvatarToAvatarDto(name, users)
                 },
                 month
             }));
@@ -76,7 +76,7 @@ export class KudosController {
         return kudos.map(({quantity, name, month, year}) => ({
                 quantity: Number(quantity), year, givenTo: {
                     name: name,
-                    avatar: this.userService.mapAvatarToAvatarDto(users.find(u => u.name == name))
+                    avatar: this.userService.mapAvatarToAvatarDto(name, users)
                 }, month
             })
         );
@@ -93,12 +93,10 @@ export class KudosController {
         type: KudosGivenDto
     })
     async postSlack(@Body() body: PostSlackDto): Promise<{ text: string }> {
-        const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
+        const timeWhenResponseUrlIsAvailable = this.slackService.getSlackResponseDelay()
         const [usersString, description] = body.text.split(';')
         const givenToUsersNames = usersString.replace(/\s+/g, " ").trim().split(' ');
-
-        const fromUser = await this.userService.findByName(body.user_name);
-        const givenToUsers = await this.userService.findByUsersName(givenToUsersNames);
+        const [fromUser, givenToUsers] = await Promise.all([this.userService.findByName(body.user_name), this.userService.findByUsersName(givenToUsersNames)]);
 
         if (!givenToUsers || givenToUsers.length === 0 || !fromUser) {
             this.slackService.responseInvalidUsername(body.response_url, timeWhenResponseUrlIsAvailable)
@@ -137,7 +135,7 @@ export class KudosController {
     })
     async saveSingleKudo(@Body() body: DialogPostSlackDto): Promise<void> {
         const payloadBody: PayloadClass = JSON.parse(body.payload);
-        const timeWhenResponseUrlIsAvailable = new Date().getTime() + 3001
+        const timeWhenResponseUrlIsAvailable = this.slackService.getSlackResponseDelay()
 
         if (!payloadBody.submission.kudos_given) {
             this.slackService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable)

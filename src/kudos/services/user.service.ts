@@ -18,11 +18,8 @@ export class UserService {
         return await this.userRepository.findOne({name: name.charAt(0) === '@' ? name.substring(1) : name});
     }
 
-    async findBy(findOneOptions: FindConditions<User>) {
-        return await this.userRepository.findOne(findOneOptions);
-    }
-
     async findByUsersName(users: string[]) {
+        if(users.length == 0) return [];
         return await this.userRepository.find({
             where: {
                 name: In(this.removeUnnecessaryAt(users))
@@ -30,11 +27,8 @@ export class UserService {
         })
     }
 
-    async getAll(): Promise<User[]> {
-        return await this.userRepository.find();
-    }
-
-    mapAvatarToAvatarDto(user: User): AvatarDto {
+    mapAvatarToAvatarDto(forUser: string, users: User[]): AvatarDto {
+        const user: User = users.find(u => u.name == forUser)
         return {
             image_24: user.image_24,
             image_32: user.image_32,

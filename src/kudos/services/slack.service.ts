@@ -32,7 +32,7 @@ export class SlackService {
             'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
         };
 
-        const req = await this.httpService
+        await this.httpService
             .post(`https://slack.com/api/dialog.open`,
                 {
                     "trigger_id": `${triggerId}`,
@@ -100,5 +100,8 @@ export class SlackService {
         )
     }
 
+    getSlackResponseDelay() {
+        return new Date().getTime() + 3001;
+    }
 
 }
