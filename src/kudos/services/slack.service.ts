@@ -2,16 +2,18 @@ import {HttpService, Injectable} from '@nestjs/common';
 import {Repository} from "typeorm";
 import {User} from "../model/user.entity";
 import {InjectRepository} from '@nestjs/typeorm';
+import {InjectConfig} from 'nestjs-config';
 
 @Injectable()
 export class SlackService {
 
     constructor(@InjectRepository(User) private readonly userRepository: Repository<User>,
-                private readonly httpService: HttpService) {
+                private readonly httpService: HttpService,
+                @InjectConfig() private readonly config) {
     }
 
     async fetchAvatars() {
-        const req: any = await this.httpService.get(`https://slack.com/api/users.list?token=${process.env.SLACK_OAUTH_TOKEN}`).toPromise()
+        const req: any = await this.httpService.get(`https://slack.com/api/users.list?token=${this.config.get('slack').slackOAuthToken}`).toPromise()
         const users = req.data.members.map(el => ({
             name: el.name,
             slackId: el.id,

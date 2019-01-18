@@ -1,16 +1,17 @@
 import {Module} from '@nestjs/common';
 import {KudosModule} from './kudos/kudos.module';
-import {ConfigModule} from "./config/config.module";
 import {TypeOrmModule} from '@nestjs/typeorm';
-import {TypeOrmConfigService} from "./config/type-orm-config.service";
+import {ConfigModule, ConfigService} from "nestjs-config";
+import * as path from 'path';
 
 @Module({
     imports: [
-        TypeOrmModule.forRootAsync({
-            useClass: TypeOrmConfigService,
-        }),
         KudosModule,
-        ConfigModule
+        ConfigModule.load(path.resolve(__dirname, 'config/**/*.{ts,js}')),
+        TypeOrmModule.forRootAsync({
+            useFactory: (config: ConfigService) => config.get('database'),
+            inject: [ConfigService],
+        }),
     ],
     providers: [],
 })
