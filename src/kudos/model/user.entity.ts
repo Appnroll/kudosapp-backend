@@ -12,6 +12,16 @@ export class User {
     @Column()
     slackId: string;
 
+    @Column({
+        default: ''
+    })
+    trelloName: string;
+
+    @Column({
+        default: ''
+    })
+    trelloId: string
+
     @Column()
     image_24: string
 

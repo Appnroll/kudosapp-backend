@@ -8,11 +8,13 @@ import {SlackController} from './controllers/slack.controller';
 import {SlackService} from './services/slack.service';
 import {UserService} from './services/user.service';
 import {UserKudosEntity} from "./model/user-kudos.entity";
+import {TrelloService} from './services/trello.service';
+import {TrelloController} from './controllers/trello.controller';
 
 @Module({
     imports: [TypeOrmModule.forFeature([Kudos, User, UserKudosEntity]), HttpModule],
-    controllers: [KudosController, SlackController],
-    providers: [KudosService, SlackService, UserService]
+    controllers: [KudosController, SlackController, TrelloController],
+    providers: [KudosService, SlackService, UserService, TrelloService]
 })
 export class KudosModule {
 }

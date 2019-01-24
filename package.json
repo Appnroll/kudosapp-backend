@@ -39,6 +39,7 @@
     "rimraf": "^2.6.2",
     "rxjs": "^6.2.2",
     "sqlite3": "^4.0.4",
+    "trello-node-api": "^0.0.7",
     "typeorm": "^0.2.10",
     "typescript": "^3.0.1"
   },
