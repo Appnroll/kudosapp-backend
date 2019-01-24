@@ -1,3 +1,5 @@
+const pathToConfiguration = process.env.NODE_ENV == 'production' ? '/../**/**.entity.js' : '/../**/**.entity{.ts,.js}';
+
 export default {
     type: process.env.TYPE,
     host: process.env.DB_HOST,
@@ -5,7 +7,7 @@ export default {
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
     port: parseInt(process.env.DB_PORT),
-    entities: [ __dirname + '/../**/**.entity{.ts,.js}'],
+    entities: [ __dirname + pathToConfiguration],
     logging: process.env.LOGGING,
     synchronize: process.env.SYNCHRONIZE,
     retryAttempts: true
