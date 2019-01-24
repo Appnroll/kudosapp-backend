@@ -49,7 +49,7 @@ router.post('/slack', async (req, res) => {
 
     return delayedSlackResponse(response_url, timeWhenResponseUrlIsAvailable, {
         "response_type": "ephemeral",
-        "text": "Kudos awarded successfully 👑"
+        "text": `Kudos for ${username} awarded successfully 👑`
     })
 
 })
