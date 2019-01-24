@@ -5,7 +5,7 @@
  */
 
 var app = require('../app');
-var debug = require('debug')('kup-kudosapp-backend:server');
+var debug = require('debug')('kudosapp-backend:server');
 var http = require('http');
 
 /**
