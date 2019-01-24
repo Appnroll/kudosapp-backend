@@ -1,3 +1,6 @@
+const pathToEntities = process.env.NODE_ENV == 'production' ? './dist/kudos/model/**.js' : 'src/kudos/model/**.ts';
+const pathToMigrations = process.env.NODE_ENV == 'production' ? [] : ["./migration/*.ts"]
+
 module.exports = {
     type: 'postgres',
     host: process.env.DB_HOST || 'localhost',
@@ -6,11 +9,11 @@ module.exports = {
     database: process.env.DB_NAME || 'kudos',
     port: parseInt(process.env.DB_PORT) || 5432,
     entities: [
-        "src/kudos/model/**.ts"
+        pathToEntities
     ],
     logging: true,
     migrationsTableName: "kudos_migration_table",
-    migrations: ["./migration/*.ts"],
+    migrations: pathToMigrations,
     cli: {
         "migrationsDir": "./migration",
     }
