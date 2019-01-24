@@ -70,8 +70,8 @@ export class KudosService {
         return await this.userKudosRepository.createQueryBuilder("userKudos")
             .select('COUNT(*)', 'quantity')
             .leftJoin('userKudos.from', 'users')
-            .addSelect(`extract(year from "userKudos"."createdAt")`, 'year')
-            .addSelect(`to_char("userKudos"."createdAt", 'Mon')`, 'month')
+            .addSelect(`extract(year from "userKudos"."historyCreatedAt")`, 'year')
+            .addSelect(`to_char("userKudos"."historyCreatedAt", 'Mon')`, 'month')
             .addSelect([`"users"."name"`])
             .addGroupBy(`"users"."name"`)
             .addGroupBy('month')
@@ -84,8 +84,8 @@ export class KudosService {
         return await this.userKudosRepository.createQueryBuilder("userKudos")
             .select('COUNT(*)', 'quantity')
             .leftJoin('userKudos.user', 'users')
-            .addSelect(`extract(year from "userKudos"."createdAt")`, 'year')
-            .addSelect(`to_char("userKudos"."createdAt", 'Mon')`, 'month')
+            .addSelect(`extract(year from "userKudos"."historyCreatedAt")`, 'year')
+            .addSelect(`to_char("userKudos"."historyCreatedAt", 'Mon')`, 'month')
             .addSelect([`"users"."name"`])
             .addGroupBy(`"users"."name"`)
             .addGroupBy('month')
@@ -94,7 +94,7 @@ export class KudosService {
             .getRawMany();
     }
 
-    async saveKudos(description: string, from: User, users: User[]): Promise<UserKudosEntity[]> {
+    async saveKudos(description: string, from: User, users: User[], createDate = new Date()): Promise<UserKudosEntity[]> {
         const kudo = this.kudosRepository.create()
         kudo.description = description;
 
@@ -105,6 +105,7 @@ export class KudosService {
             userKudos.user = user;
             userKudos.kudos = kudo;
             userKudos.from = from;
+            userKudos.historyCreatedAt = createDate;
             return userKudos;
         })
 

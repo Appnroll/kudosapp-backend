@@ -1,4 +1,5 @@
 import {
+    Column,
     CreateDateColumn,
     Entity,
     ManyToOne,
@@ -26,6 +27,9 @@ export class UserKudosEntity {
     @PrimaryColumn()
     @CreateDateColumn({type: 'date'})
     createdAt: Date;
+
+    @Column()
+    historyCreatedAt: Date;
 
     @UpdateDateColumn({type: 'date'})
     updatedAt: Date;

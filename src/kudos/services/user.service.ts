@@ -10,6 +10,30 @@ export class UserService {
     constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {
     }
 
+    async findAllByTrelloName(trelloNameIds: string[]){
+        return await this.userRepository.find({
+            where: {
+                trelloName: In(trelloNameIds)
+            }
+        });
+    }
+
+    async findAllByTrelloId(trelloIds: string[]){
+        return await this.userRepository.find({
+            where: {
+                trelloId: In(trelloIds)
+            }
+        });
+    }
+
+    async saveUsers(users: User[]){
+        return await this.userRepository.save(users);
+    }
+
+    async findAll(){
+        return await this.userRepository.find();
+    }
+
     async findUserBySlackId(slackId: string) {
         return await this.userRepository.findOne({slackId: slackId});
     }
