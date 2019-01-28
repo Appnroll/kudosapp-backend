@@ -4,16 +4,17 @@ import {TrelloService} from "../services/trello.service";
 @Controller('trello')
 export class TrelloController {
 
-    constructor(private trelloService: TrelloService){}
+  constructor(private trelloService: TrelloService) {
+  }
 
-    @Get('/cards')
-    async getBoards() {
-        await this.trelloService.fetchCards();
-    }
+  @Get('/cards')
+  async getBoards() {
+    await this.trelloService.fetchCards();
+  }
 
-    @Get('/users')
-    async getUsers() {
-        await this.trelloService.saveTrelloUsers();
-    }
+  @Get('/users')
+  async getUsers() {
+    await this.trelloService.saveTrelloUsers();
+  }
 
 }
