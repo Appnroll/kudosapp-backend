@@ -1,14 +1,14 @@
 import {Test, TestingModule} from '@nestjs/testing';
-import {TrelloService} from './trello.service';
+import {UserTokenService} from './user-token.service';
 
-describe('TrelloService', () => {
-  let service: TrelloService;
+describe('UserTokenService', () => {
+  let service: UserTokenService;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [TrelloService],
+      providers: [UserTokenService],
     }).compile();
-    service = module.get<TrelloService>(TrelloService);
+    service = module.get<UserTokenService>(UserTokenService);
   });
   it('should be defined', () => {
     expect(service).toBeDefined();
