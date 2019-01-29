@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { TrelloService } from './trello.service';
+import {Test, TestingModule} from '@nestjs/testing';
+import {TrelloService} from './trello.service';
 
 describe('TrelloService', () => {
   let service: TrelloService;
-  
+
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [TrelloService],

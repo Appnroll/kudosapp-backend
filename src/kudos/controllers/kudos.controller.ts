@@ -11,7 +11,6 @@ import {SingleKudosSlackDto} from "../dto/single-kudos-slack.dto";
 import {SlackTokenGuard} from "../guards/slackToken.guard";
 import {KudosDto} from "../dto/kudos.dto";
 import {ApiBearerAuth, ApiForbiddenResponse, ApiResponse, ApiUseTags} from '@nestjs/swagger';
-import {AvatarDto} from "../dto/avatar.dto";
 import {AuthGuard} from "../guards/auth.guard";
 
 @Controller('kudos')

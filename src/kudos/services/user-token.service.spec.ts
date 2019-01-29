@@ -1,9 +1,9 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { UserTokenService } from './user-token.service';
+import {Test, TestingModule} from '@nestjs/testing';
+import {UserTokenService} from './user-token.service';
 
 describe('UserTokenService', () => {
   let service: UserTokenService;
-  
+
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [UserTokenService],

@@ -7,24 +7,24 @@ import {TypeOrmConfigTestService} from "../../config/type-orm-config-test.servic
 import {TypeOrmModule} from '@nestjs/typeorm';
 
 describe('KudosService', () => {
-    let service: KudosService;
-    let kudosRepository: Repository<Kudos>;
+  let service: KudosService;
+  let kudosRepository: Repository<Kudos>;
 
-    beforeAll(async () => {
-        const module: TestingModule = await Test.createTestingModule({
-            imports: [
-                HttpModule,
-                TypeOrmModule.forRootAsync({
-                    useClass: TypeOrmConfigTestService,
-                })
-            ],
-            providers: [
-                KudosService,
-            ],
-        }).compile();
-        service = module.get<KudosService>(KudosService);
-    });
-    it('should be defined', () => {
-        expect(service).toBeDefined();
-    });
+  beforeAll(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      imports: [
+        HttpModule,
+        TypeOrmModule.forRootAsync({
+          useClass: TypeOrmConfigTestService,
+        })
+      ],
+      providers: [
+        KudosService,
+      ],
+    }).compile();
+    service = module.get<KudosService>(KudosService);
+  });
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
 });
