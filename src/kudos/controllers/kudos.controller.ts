@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpCode, Post, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, Post, Query, UseGuards} from '@nestjs/common';
 import {KudosService} from "../services/kudos.service";
 import {KudosRankingDto} from "../dto/kudos-ranking.dto";
 import {KudosFromDto} from "../dto/kudos-from.dto";
@@ -12,6 +12,8 @@ import {SlackTokenGuard} from "../guards/slackToken.guard";
 import {KudosDto} from "../dto/kudos.dto";
 import {ApiBearerAuth, ApiForbiddenResponse, ApiResponse, ApiUseTags} from '@nestjs/swagger';
 import {AuthGuard} from "../guards/auth.guard";
+import {PaginationDto} from "../dto/pagination.dto";
+import {PageDto} from "../dto/page.dto";
 
 @Controller('kudos')
 @ApiUseTags('kudos')
@@ -24,9 +26,10 @@ export class KudosController {
 
   @Get()
   @UseGuards(AuthGuard)
-  @ApiResponse({status: 200, description: 'Get all Kudos', type: KudosDto, isArray: true})
-  getKudos(): Promise<KudosDto[]> {
-    return this.kudosService.getAllWithAvatars();
+  @ApiResponse({status: 200, description: 'Get all Kudos', type: PageDto, isArray: true})
+  async getKudos(@Query('page') page: number = 0, @Query('size') size: number = 25): Promise<PageDto<KudosDto>> {
+    const pagination: PaginationDto = {page, size}
+    return await this.kudosService.getAllPaginated(pagination);
   }
 
   @Get('rankings')

@@ -6,6 +6,9 @@ import {User} from "../model/user.entity";
 import {UserKudosEntity} from "../model/user-kudos.entity";
 import {groupBy, map} from "lodash";
 import {AvatarDto} from "../dto/avatar.dto";
+import {PaginationDto} from "../dto/pagination.dto";
+import {KudosDto} from "../dto/kudos.dto";
+import {PageDto} from "../dto/page.dto";
 
 @Injectable()
 export class KudosService {
@@ -14,13 +17,8 @@ export class KudosService {
               @InjectRepository(UserKudosEntity) private readonly userKudosRepository: Repository<UserKudosEntity>) {
   }
 
-  async getAllWithAvatars() {
-    const userKudos = await this.userKudosRepository
-      .createQueryBuilder('userKudos')
-      .leftJoinAndSelect('userKudos.user', 'users')
-      .leftJoinAndSelect('userKudos.kudos', 'kudos')
-      .leftJoinAndSelect('userKudos.from', 'fromUser')
-      .getRawMany()
+  async getAllPaginated(pagination: PaginationDto) {
+    const userKudos = await this.fetchKudosWithUser(pagination)
 
     const groupedKudos = groupBy(userKudos, el => el.userKudos_kudosId);
     const getUserAvatar = (userObj) => ({
@@ -31,7 +29,8 @@ export class KudosService {
       image_192: userObj.users_image_192
     } as AvatarDto)
 
-    return map(groupedKudos, (value) => {
+
+    const userKudosAvatars = map(groupedKudos, (value) => {
       const kudosProperties = value[0]
       return {
         description: kudosProperties.kudos_description,
@@ -53,6 +52,39 @@ export class KudosService {
         )
       }
     })
+    const hasNext = userKudosAvatars.length > pagination.size
+    if (hasNext) {
+      userKudosAvatars.pop();
+    }
+    return {
+      data: userKudosAvatars,
+      size: userKudosAvatars.length,
+      page: pagination.page,
+      hasNext: hasNext
+    } as PageDto<KudosDto>
+  }
+
+  async fetchKudosWithUser(pagination: PaginationDto) {
+    const kudos = await this.userKudosRepository.createQueryBuilder('userKudos')
+      .select("count(*)")
+      .addSelect(`"userKudos"."kudosId"`)
+      .addSelect(`"userKudos"."historyCreatedAt"`)
+      .groupBy(`"userKudos"."kudosId"`)
+      .addGroupBy(`"userKudos"."historyCreatedAt"`)
+      .take(Number(pagination.size) + 1)
+      .skip(Number(pagination.size * pagination.page))
+      .orderBy(`"userKudos"."historyCreatedAt"`, "DESC")
+      .getRawMany()
+
+    const kudosId = kudos.map(el => el.kudosId);
+    if (kudosId.length == 0) return [];
+    return await this.userKudosRepository
+      .createQueryBuilder('userKudos')
+      .leftJoinAndSelect('userKudos.user', 'users')
+      .leftJoinAndSelect('userKudos.kudos', 'kudos')
+      .leftJoinAndSelect('userKudos.from', 'fromUser')
+      .where(`userKudos.kudos IN (${[...kudosId]})`,)
+      .getRawMany()
   }
 
   async getRankings(): Promise<{ totalPoints: number, name: string }[]> {
