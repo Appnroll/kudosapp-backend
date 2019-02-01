@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpCode, Post, Query, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, HttpCode, Param, Post, Query, UseGuards} from '@nestjs/common';
 import {KudosService} from "../services/kudos.service";
 import {KudosRankingDto} from "../dto/kudos-ranking.dto";
 import {KudosFromDto} from "../dto/kudos-from.dto";
@@ -26,7 +26,7 @@ export class KudosController {
 
   @Get()
   @UseGuards(AuthGuard)
-  @ApiResponse({status: 200, description: 'Get all Kudos', type: PageDto, isArray: true})
+  @ApiResponse({status: 200, description: 'Get all Kudos', type: PageDto})
   async getKudos(@Query('page') page: number = 0, @Query('size') size: number = 25): Promise<PageDto<KudosDto>> {
     const pagination: PaginationDto = {page, size}
     return await this.kudosService.getAllPaginated(pagination);
@@ -57,7 +57,7 @@ export class KudosController {
   })
   @UseGuards(AuthGuard)
   async kudosFromUsers(): Promise<KudosFromDto[]> {
-    const kudos = await this.kudosService.getFrom();
+    const kudos = await this.kudosService.getFromAll();
     const users = await this.userService.findByUsersName(kudos.map(el => el.name))
     return kudos.map(({quantity, name, month, year}) =>
       ({
@@ -69,6 +69,48 @@ export class KudosController {
       }));
   }
 
+  @Get('from/:year/:month')
+  @ApiResponse({
+    status: 200,
+    description: 'Kudos `from` statistics for month/year',
+    type: KudosFromDto,
+    isArray: true
+  })
+  @UseGuards(AuthGuard)
+  async kudosFromYearMonthSpecific(@Param('year') year, @Param('month') month): Promise<KudosFromDto[]> {
+    const kudos = await this.kudosService.getFrom(year, month);
+    const users = await this.userService.findByUsersName(kudos.map(el => el.name))
+    return kudos.map(({quantity, name, month, year}) =>
+      ({
+        quantity: Number(quantity), year, from: {
+          name: name,
+          avatar: this.userService.mapAvatarToAvatarDto(name, users)
+        },
+        month
+      }));
+  }
+
+
+  @Get('given/:year/:month')
+  @ApiResponse({
+    status: 200,
+    description: 'Kudos `given` overall for month/year',
+    type: KudosGivenDto,
+    isArray: true
+  })
+  @UseGuards(AuthGuard)
+  async kudosGivenYearMonthSpecific(@Param('year') year, @Param('month') month): Promise<KudosGivenDto[]> {
+    const kudos = await this.kudosService.getGiven(year, month);
+    const users = await this.userService.findByUsersName(kudos.map(el => el.name))
+    return kudos.map(({quantity, name, month, year}) => ({
+        quantity: Number(quantity), year, givenTo: {
+          name: name,
+          avatar: this.userService.mapAvatarToAvatarDto(name, users)
+        }, month
+      })
+    );
+  }
+
   @Get('given')
   @ApiResponse({
     status: 200,
@@ -78,7 +120,7 @@ export class KudosController {
   })
   @UseGuards(AuthGuard)
   async kudosGivenToUsers(): Promise<KudosGivenDto[]> {
-    const kudos = await this.kudosService.getGiven();
+    const kudos = await this.kudosService.getGivenAll();
     const users = await this.userService.findByUsersName(kudos.map(el => el.name))
     return kudos.map(({quantity, name, month, year}) => ({
         quantity: Number(quantity), year, givenTo: {

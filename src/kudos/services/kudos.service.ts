@@ -9,12 +9,14 @@ import {AvatarDto} from "../dto/avatar.dto";
 import {PaginationDto} from "../dto/pagination.dto";
 import {KudosDto} from "../dto/kudos.dto";
 import {PageDto} from "../dto/page.dto";
+import {DateService} from "./date.service";
 
 @Injectable()
 export class KudosService {
 
   constructor(@InjectRepository(Kudos) private readonly kudosRepository: Repository<Kudos>,
-              @InjectRepository(UserKudosEntity) private readonly userKudosRepository: Repository<UserKudosEntity>) {
+              @InjectRepository(UserKudosEntity) private readonly userKudosRepository: Repository<UserKudosEntity>,
+              private dateService: DateService) {
   }
 
   async getAllPaginated(pagination: PaginationDto) {
@@ -98,7 +100,7 @@ export class KudosService {
       .getRawMany();
   }
 
-  async getFrom(): Promise<{ quantity: number, year: number, month: string, name: string }[]> {
+  async getFromAll(): Promise<{ quantity: number, year: number, month: string, name: string }[]> {
     return await this.userKudosRepository.createQueryBuilder("userKudos")
       .select('COUNT(*)', 'quantity')
       .leftJoin('userKudos.from', 'users')
@@ -112,7 +114,41 @@ export class KudosService {
       .getRawMany();
   }
 
-  async getGiven(): Promise<{ quantity: number, year: number, month: string, name: string }[]> {
+  async getFrom(year: number, month: number): Promise<{ quantity: number, year: number, month: string, name: string }[]> {
+    const monthShorten = this.dateService.getMonthShorten(month)
+    return await this.userKudosRepository.createQueryBuilder("userKudos")
+      .select('COUNT(*)', 'quantity')
+      .leftJoin('userKudos.from', 'users')
+      .addSelect(`extract(year from "userKudos"."historyCreatedAt")`, 'year')
+      .addSelect(`to_char("userKudos"."historyCreatedAt", 'Mon')`, 'month')
+      .addSelect([`"users"."name"`])
+      .addGroupBy(`"users"."name"`)
+      .addGroupBy('month')
+      .addGroupBy('year')
+      .addOrderBy(`"users"."name"`, "ASC")
+      .where(`extract(year from "userKudos"."historyCreatedAt") = :year`, {year})
+      .andWhere(`to_char("userKudos"."historyCreatedAt", 'Mon') = :month`, {month: monthShorten})
+      .getRawMany();
+  }
+
+  async getGiven(year: number, month: number): Promise<{ quantity: number, year: number, month: string, name: string }[]> {
+    const monthShorten = this.dateService.getMonthShorten(month)
+    return await this.userKudosRepository.createQueryBuilder("userKudos")
+      .select('COUNT(*)', 'quantity')
+      .leftJoin('userKudos.user', 'users')
+      .addSelect(`extract(year from "userKudos"."historyCreatedAt")`, 'year')
+      .addSelect(`to_char("userKudos"."historyCreatedAt", 'Mon')`, 'month')
+      .addSelect([`"users"."name"`])
+      .addGroupBy(`"users"."name"`)
+      .addGroupBy('month')
+      .addGroupBy('year')
+      .addOrderBy(`"users"."name"`, "ASC")
+      .where(`extract(year from "userKudos"."historyCreatedAt") = :year`, {year})
+      .andWhere(`to_char("userKudos"."historyCreatedAt", 'Mon') = :month`, {month: monthShorten})
+      .getRawMany();
+  }
+
+  async getGivenAll(): Promise<{ quantity: number, year: number, month: string, name: string }[]> {
     return await this.userKudosRepository.createQueryBuilder("userKudos")
       .select('COUNT(*)', 'quantity')
       .leftJoin('userKudos.user', 'users')
