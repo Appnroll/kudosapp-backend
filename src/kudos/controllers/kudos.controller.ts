@@ -94,7 +94,7 @@ export class KudosController {
   @Get('given/:year/:month')
   @ApiResponse({
     status: 200,
-    description: 'Kudos `given` overall for month/year',
+    description: 'Kudos `given` for month/year',
     type: KudosGivenDto,
     isArray: true
   })
