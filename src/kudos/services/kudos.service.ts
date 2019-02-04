@@ -35,6 +35,7 @@ export class KudosService {
     const userKudosAvatars = map(groupedKudos, (value) => {
       const kudosProperties = value[0]
       return {
+        createdAt: kudosProperties.userKudos_historyCreatedAt,
         description: kudosProperties.kudos_description,
         from: {
           avatar: {
