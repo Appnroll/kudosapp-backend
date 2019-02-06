@@ -63,6 +63,16 @@ export class SlackService {
     await this.userRepository.save(usersEntities)
   }
 
+  async revokeToken(token: string) {
+    const headersRequest = {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    };
+    const paramsQueryString = stringify({
+      token,
+    })
+    await this.httpService.get(`${this.SLACK_API}/auth.revoke?${paramsQueryString}`, {headers: headersRequest}).toPromise()
+  }
+
 
   async openSlackDialog(triggerId) {
     const headersRequest = {

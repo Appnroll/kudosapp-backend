@@ -1,7 +1,8 @@
-import {Controller, Get, HttpCode, Query, Res} from '@nestjs/common';
+import {Controller, Get, HttpCode, Query, Req, Res, UseGuards} from '@nestjs/common';
 import {SlackService} from "../services/slack.service";
 import {ApiUseTags} from '@nestjs/swagger';
 import {UserTokenService} from "../services/user-token.service";
+import {AuthGuard} from "../guards/auth.guard";
 
 @Controller('slack')
 @ApiUseTags('slack')
@@ -23,6 +24,16 @@ export class SlackController {
   @HttpCode(200)
   async fetchAvatars() {
     await this.slackService.fetchAvatars();
+    return {status: 'ok'};
+  }
+
+  @Get('logout')
+  @UseGuards(AuthGuard)
+  @HttpCode(200)
+  async logout(@Req() req) {
+    const userToken = req.userToken;
+    await this.userSlackService.removeToken(userToken);
+    await this.slackService.revokeToken(userToken.token);
     return {status: 'ok'};
   }
 

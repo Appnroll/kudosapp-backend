@@ -1,4 +1,12 @@
-import {Column, CreateDateColumn, Entity, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  OneToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn
+} from "typeorm";
 import {User} from "./user.entity";
 
 @Entity()
@@ -10,6 +18,7 @@ export class SlackToken {
   token: string;
 
   @OneToOne(type => User)
+  @JoinColumn()
   user: User;
 
   @CreateDateColumn({type: 'date'})
