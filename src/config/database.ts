@@ -8,7 +8,7 @@ export default {
   database: process.env.DB_NAME,
   port: parseInt(process.env.DB_PORT),
   entities: [__dirname + pathToConfiguration],
-  logging: Boolean(process.env.LOGGING),
-  synchronize: process.env.SYNCHRONIZE,
+  logging: Boolean(process.env.DB_LOGGING),
+  synchronize: Boolean(process.env.DB_SYNCHRONIZE),
   retryAttempts: true
 };
