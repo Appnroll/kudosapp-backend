@@ -56,7 +56,7 @@ export class KudosService {
     })
     const hasNext = userKudosAvatars.length > pagination.size
     if (hasNext) {
-      userKudosAvatars.pop();
+      userKudosAvatars.shift();
     }
     return {
       data: userKudosAvatars,
