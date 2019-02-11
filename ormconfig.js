@@ -11,9 +11,10 @@ module.exports = {
     entities: [
         pathToEntities
     ],
-    logging: true,
+    logging: Boolean(process.env.DB_LOGGING),
     migrationsTableName: "kudos_migration_table",
     migrations: pathToMigrations,
+    synchronize: Boolean(process.env.DB_SYNCHRONIZE),
     cli: {
         "migrationsDir": "./migration",
     }

@@ -10,4 +10,6 @@ export class KudosDto {
   readonly givenTo: UserDto[];
   @ApiModelProperty()
   readonly description: string;
+  @ApiModelProperty()
+  readonly createdAt: string;
 }

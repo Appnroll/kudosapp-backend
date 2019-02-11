@@ -19,6 +19,10 @@ export class UserTokenService {
     })
   }
 
+  async removeToken(userToken: SlackToken){
+    await await this.slackTokenRepository.remove(userToken)
+  }
+
   async saveOrUpdate(token: string, slackId: string) {
     const user = await this.userService.findUserBySlackId(slackId)
     if (!user) {

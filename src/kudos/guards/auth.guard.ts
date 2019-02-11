@@ -16,12 +16,13 @@ export class AuthGuard implements CanActivate {
     }
 
     const token = auth.split(' ')[1];
-    const user = await this.userToken.findUserByToken(token)
+    const userToken = await this.userToken.findUserByToken(token)
 
-    if (!user) {
+    if (!userToken) {
       return false
     }
 
+    request.userToken = userToken;
     return true;
 
   }
