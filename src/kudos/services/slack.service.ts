@@ -144,10 +144,12 @@ export class SlackService {
       'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
     };
 
+    console.log(data);
+
     const request = await this.httpService
       .post(`${this.SLACK_API}/chat.postMessage`,
         {
-          "channel" : `${data.channel_id}`,
+          "channel": `${data.channel_id}`,
           "attachments": [
             {
               "text": "Pick some option",
@@ -198,7 +200,6 @@ export class SlackService {
   getSlackResponseDelay() {
     return new Date().getTime() + 3001;
   }
-
 
 
 }
