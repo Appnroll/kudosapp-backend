@@ -5,9 +5,9 @@ import {
   JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from "typeorm";
-import {User} from "./user.entity";
+  UpdateDateColumn,
+} from 'typeorm';
+import { User } from './user.entity';
 
 @Entity()
 export class SlackToken {
@@ -17,14 +17,16 @@ export class SlackToken {
   @Column('text')
   token: string;
 
-  @OneToOne(type => User)
+  @OneToOne(type => User, {
+    eager: true,
+  })
   @JoinColumn()
   user: User;
 
-  @CreateDateColumn({type: 'date'})
+  @CreateDateColumn({ type: 'date' })
   createdAt: Date;
 
-  @UpdateDateColumn({type: 'date'})
+  @UpdateDateColumn({ type: 'date' })
   updatedAt: Date;
 
 }

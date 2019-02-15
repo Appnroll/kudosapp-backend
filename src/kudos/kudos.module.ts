@@ -1,4 +1,5 @@
 import {HttpModule, Module} from '@nestjs/common';
+import { UserPresentEntity } from '../availability/model/user-present.entity';
 import {KudosController} from './controllers/kudos.controller';
 import {KudosService} from './services/kudos.service';
 import {Kudos} from "./model/kudos.entity";
@@ -15,7 +16,7 @@ import {SlackToken} from "./model/slack-token.entity";
 import { DateService } from './services/date.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Kudos, User, UserKudosEntity, SlackToken]), HttpModule],
+  imports: [TypeOrmModule.forFeature([Kudos, User, UserKudosEntity, SlackToken, UserPresentEntity]), HttpModule],
   controllers: [KudosController, SlackController, TrelloController],
   providers: [KudosService, SlackService, UserService, TrelloService, UserTokenService, DateService]
 })

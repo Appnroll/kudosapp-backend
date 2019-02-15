@@ -50,7 +50,9 @@ export class User {
   @OneToMany(type => UserKudosEntity, userKudos => userKudos.user)
   userKudos: UserKudosEntity[];
 
-  @OneToMany(type => UserPresentEntity, userPresent => userPresent.user)
+  @OneToMany(type => UserPresentEntity, userPresent => userPresent.user, {
+    eager: true,
+  })
   userAvailability: UserPresentEntity;
 
 }
