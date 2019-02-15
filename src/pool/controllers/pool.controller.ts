@@ -11,41 +11,10 @@ export class PoolController {
   }
 
   @Post()
-  poolCommand(@Body() body: PoolCreateDto) {
+  async poolCommand(@Body() body: PoolCreateDto, @Res() res) {
     console.log(body)
-    return {
-      "text": "This is your first interactive message",
-      "attachments": [
-        {
-          "text": "Building buttons is easy right?",
-          "fallback": "Shame... buttons aren't supported in this land",
-          "callback_id": "button_tutorial",
-          "color": "#3AA3E3",
-          "attachment_type": "default",
-          "actions": [
-            {
-              "name": "yes",
-              "text": "yes",
-              "type": "button",
-              "value": "yes"
-            },
-            {
-              "name": "no",
-              "text": "no",
-              "type": "button",
-              "value": "no"
-            },
-            {
-              "name": "maybe",
-              "text": "maybe",
-              "type": "button",
-              "value": "maybe",
-              "style": "danger"
-            }
-          ]
-        }
-      ]
-    }
+    await this.slackService.sendSlackChatMessage(body)
+    res.status(HttpStatus.OK).json();
   }
 
   @Post('action')

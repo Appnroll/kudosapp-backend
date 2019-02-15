@@ -148,7 +148,34 @@ export class SlackService {
       .post(`${this.SLACK_API}/chat.postMessage`,
         {
           "channel" : `${data.channel_id}`,
-          "attachments": "",
+          "attachments": [
+            {
+              "text": "Pick some option",
+              "callback_id": "button_tutorial",
+              "color": "#3AA3E3",
+              "attachment_type": "default",
+              "actions": [
+                {
+                  "type": "button",
+                  "text": ":one:",
+                  "style": "primary",
+                  "value": "some1"
+                },
+                {
+                  "type": "button",
+                  "text": ":two:",
+                  "style": "primary",
+                  "value": "some2"
+                },
+                {
+                  "type": "button",
+                  "text": ":three:",
+                  "style": "primary",
+                  "value": "some3"
+                },
+              ]
+            }
+          ],
           "text": "Pick something",
         }, {headers: headersRequest}).toPromise()
     console.log('Request response: ')
