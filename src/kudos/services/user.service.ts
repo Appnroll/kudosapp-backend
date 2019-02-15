@@ -62,6 +62,16 @@ export class UserService {
     } as AvatarDto
   }
 
+  mapAvatar(user: User): AvatarDto {
+    return {
+      image_24: user.image_24,
+      image_32: user.image_32,
+      image_48: user.image_48,
+      image_72: user.image_72,
+      image_192: user.image_192,
+    } as AvatarDto
+  }
+
   removeUnnecessaryAt(usersNames: string[]) {
     return usersNames.map(el => {
       return el.charAt(0) === `@` ? el.substring(1) : el;

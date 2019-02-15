@@ -5,5 +5,5 @@ export class UserDto {
   @ApiModelProperty()
   readonly name: string;
   @ApiModelProperty()
-  readonly avatar: AvatarDto;
+  readonly avatar: AvatarDto;@
 }

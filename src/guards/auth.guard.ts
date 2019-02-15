@@ -1,5 +1,5 @@
 import {CanActivate, ExecutionContext, Injectable} from "@nestjs/common";
-import {UserTokenService} from "../services/user-token.service";
+import {UserTokenService} from "../kudos/services/user-token.service";
 
 @Injectable()
 export class AuthGuard implements CanActivate {

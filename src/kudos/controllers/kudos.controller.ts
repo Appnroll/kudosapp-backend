@@ -8,10 +8,10 @@ import {UserService} from "../services/user.service";
 import {DialogPostSlackDto, PayloadClass} from "../dto/dialog-post-slack.dto";
 import {SlackService} from "../services/slack.service";
 import {SingleKudosSlackDto} from "../dto/single-kudos-slack.dto";
-import {SlackTokenGuard} from "../guards/slackToken.guard";
+import {SlackTokenGuard} from "../../guards/slackToken.guard";
 import {KudosDto} from "../dto/kudos.dto";
 import {ApiBearerAuth, ApiForbiddenResponse, ApiResponse, ApiUseTags} from '@nestjs/swagger';
-import {AuthGuard} from "../guards/auth.guard";
+import {AuthGuard} from "../../guards/auth.guard";
 import {PaginationDto} from "../dto/pagination.dto";
 import {PageDto} from "../dto/page.dto";
 
