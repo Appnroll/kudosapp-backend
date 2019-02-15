@@ -1,11 +1,17 @@
 import {Body, Controller, HttpStatus, Post, Res} from '@nestjs/common';
 import {PostSlackDto} from "../../kudos/dto/post-slack.dto";
+import {PoolCreateDto} from "../dto/pool-create.dto";
+import {SlackService} from "../../kudos/services/slack.service";
 
 @Controller('pool')
 export class PoolController {
 
+  constructor(private slackService: SlackService) {
+
+  }
+
   @Post()
-  poolCommand(@Body() body: PostSlackDto) {
+  poolCommand(@Body() body: PoolCreateDto) {
     console.log(body)
     return {
       "text": "This is your first interactive message",

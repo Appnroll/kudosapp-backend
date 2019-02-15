@@ -5,6 +5,7 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {InjectConfig} from 'nestjs-config';
 import {map} from "rxjs/operators";
 import {stringify} from "querystring";
+import {PoolCreateDto} from "../../pool/dto/pool-create.dto";
 
 @Injectable()
 export class SlackService {
@@ -137,6 +138,23 @@ export class SlackService {
     })
   }
 
+  async sendSlackChatMessage(data: PoolCreateDto) {
+    const headersRequest = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
+    };
+
+    const request = await this.httpService
+      .post(`${this.SLACK_API}/chat.postMessage`,
+        {
+          "channel" : `${data.channel_id}`,
+          "attachments": "",
+          "text": "Pick something",
+        }, {headers: headersRequest}).toPromise()
+    console.log('Request response: ')
+    console.log(request.data)
+  }
+
 
   delayedSlackResponse(url: string, timeWhenResponseUrlIsAvailable: number, reason: {}) {
     setTimeout(
@@ -153,5 +171,7 @@ export class SlackService {
   getSlackResponseDelay() {
     return new Date().getTime() + 3001;
   }
+
+
 
 }
