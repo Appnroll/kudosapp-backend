@@ -152,33 +152,52 @@ export class SlackService {
           "channel": `${data.channel_id}`,
           "attachments": [
             {
+              "fields": [
+                {
+                  "title": "Value1",
+                  "value": "@kgajowy",
+                  "short": false
+                },
+                {
+                  "title": "Value2",
+                  "value": "@kgajowy",
+                  "short": false
+                },
+                {
+                  "title": "Value3",
+                  "value": "@dota",
+                  "short": false
+                }
+              ],
               "text": "Pick some option",
               "callback_id": "button_tutorial",
               "color": "#3AA3E3",
               "attachment_type": "default",
               "actions": [
                 {
-                  "type": "button",
-                  "text": ":one:",
-                  "style": "primary",
-                  "value": "some1"
-                },
-                {
-                  "type": "button",
-                  "text": ":two:",
-                  "style": "primary",
-                  "value": "some2"
-                },
-                {
-                  "type": "button",
+                  "name": "pool",
                   "text": ":three:",
-                  "style": "primary",
-                  "value": "some3"
+                  "style": "danger",
+                  "type": "button",
+                  "value": "something1"
                 },
+                {
+                  "name": "pool",
+                  "text": ":two:",
+                  "style": "danger",
+                  "type": "button",
+                  "value": "something2"
+                },
+                {
+                  "name": "pool",
+                  "text": ":one:",
+                  "style": "danger",
+                  "type": "button",
+                  "value": "something3"
+                }
               ]
             }
           ],
-          "text": "Pick something",
         }, {headers: headersRequest}).toPromise()
     console.log('Request response: ')
     console.log(request.data)
