@@ -144,7 +144,7 @@ export class SlackService {
       'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
     };
 
-    console.log(data);
+    console.log(data.channel_id);
 
     const request = await this.httpService
       .post(`${this.SLACK_API}/chat.postMessage`,
