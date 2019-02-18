@@ -15,7 +15,7 @@ export class Kudos {
   channel: string;
 
   @Column('text')
-  callback_id: string;
+  timestamp: string;
 
   @CreateDateColumn({type: 'date'})
   createdAt: Date;
