@@ -8,7 +8,7 @@ import {Kudos} from "../src/kudos/model/kudos.entity";
 import {getRepositoryToken} from '@nestjs/typeorm';
 import {UserKudosEntity} from "../src/kudos/model/user-kudos.entity";
 import {User} from "../src/kudos/model/user.entity";
-import {seedDefaultData} from "./data.seeds";
+import {seedAuthData, seedDefaultData} from "./data.seeds";
 import {SlackToken} from "../src/kudos/model/slack-token.entity";
 
 dotenv.config({path: `${__dirname}/../.env.test`})
@@ -36,6 +36,17 @@ describe('Kudos (e2e)', () => {
   });
 
   describe('(GET) /ranking ', () => {
+    beforeEach(async () => {
+      await seedAuthData(userRepository, slackTokenRepository);
+    })
+
+    afterEach(async () => {
+      await userKudosEntityRepository.delete({});
+      await slackTokenRepository.delete({})
+      await kudosRepository.delete({});
+      await userRepository.delete({});
+    });
+
     it('should return empty response', () => {
       return request(app.getHttpServer())
         .get('/kudos/rankings')
@@ -45,7 +56,6 @@ describe('Kudos (e2e)', () => {
           expect(res.body.length).toBe([].length)
         })
     });
-
   })
 
   describe('(GET) /ranking ', () => {
@@ -55,6 +65,7 @@ describe('Kudos (e2e)', () => {
 
     afterEach(async () => {
       await userKudosEntityRepository.delete({});
+      await slackTokenRepository.delete({})
       await kudosRepository.delete({});
       await userRepository.delete({});
     });

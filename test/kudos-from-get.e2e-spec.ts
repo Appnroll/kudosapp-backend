@@ -8,7 +8,7 @@ import {getRepositoryToken} from '@nestjs/typeorm';
 import {AppModule} from "../src/app.module";
 import {UserKudosEntity} from "../src/kudos/model/user-kudos.entity";
 import {User} from "../src/kudos/model/user.entity";
-import {seedDefaultData} from "./data.seeds";
+import {seedAuthData, seedDefaultData} from "./data.seeds";
 import {AvatarDto} from "../src/kudos/dto/avatar.dto";
 import {SlackToken} from "../src/kudos/model/slack-token.entity";
 
@@ -38,13 +38,24 @@ describe('Kudos (e2e)', () => {
   });
 
   describe('(GET) /from ', () => {
+    beforeEach(async () => {
+      await seedAuthData(userRepository, slackTokenRepository);
+    })
+
+    afterEach(async () => {
+      await userKudosEntityRepository.delete({});
+      await slackTokenRepository.delete({})
+      await kudosRepository.delete({});
+      await userRepository.delete({});
+    });
+
+
     it('should return empty response', () => {
       return request(app.getHttpServer())
         .get('/kudos/from')
         .set('Authorization', 'Bearer: token')
         .expect(200)
         .then(res => {
-          console.log(res.body);
           expect(res.body.length).toBe([].length)
         })
     });
@@ -58,6 +69,7 @@ describe('Kudos (e2e)', () => {
 
     afterEach(async () => {
       await userKudosEntityRepository.delete({});
+      await slackTokenRepository.delete({})
       await kudosRepository.delete({});
       await userRepository.delete({});
     });
@@ -75,6 +87,7 @@ describe('Kudos (e2e)', () => {
         year: expect.any(Number),
         month: expect.any(String),
         from: {
+          available: false,
           name: "nameCreator",
           avatar: {
             image_24: "",
