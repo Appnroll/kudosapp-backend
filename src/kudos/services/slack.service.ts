@@ -5,6 +5,7 @@ import {InjectRepository} from '@nestjs/typeorm';
 import {InjectConfig} from 'nestjs-config';
 import {map} from "rxjs/operators";
 import {stringify} from "querystring";
+import {get} from 'lodash'
 
 @Injectable()
 export class SlackService {
@@ -50,7 +51,7 @@ export class SlackService {
 
   async fetchAvatars() {
     const req: any = await this.httpService.get(`${this.SLACK_API}/users.list?token=${this.config.get('slack').slackOAuthToken}`).toPromise()
-    const users = req.data.members.map(el => ({
+    const users = get(req, 'data.members', []).map(el => ({
       name: el.name,
       slackId: el.id,
       image_24: el.profile.image_24,

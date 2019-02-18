@@ -42,6 +42,7 @@ describe('Kudos (e2e)', () => {
 
     afterEach(async () => {
       await userKudosEntityRepository.delete({});
+      await slackTokenRepository.delete({})
       await kudosRepository.delete({});
       await userRepository.delete({});
     });

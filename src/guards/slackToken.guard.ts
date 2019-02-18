@@ -1,6 +1,6 @@
 import {Observable} from "rxjs";
 import {CanActivate, ExecutionContext, Injectable} from "@nestjs/common";
-import {SlackService} from "../services/slack.service";
+import {SlackService} from "../kudos/services/slack.service";
 
 @Injectable()
 export class SlackTokenGuard implements CanActivate {
