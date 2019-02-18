@@ -1,12 +1,12 @@
-const pathToEntities = process.env.NODE_ENV == 'production' ? './dist/kudos/model/**.js' : 'src/kudos/model/**.ts';
+const pathToEntities = process.env.NODE_ENV == 'production' ? './dist/**/**.entity.js' : 'src/**/**.entity.ts';
 const pathToMigrations = process.env.NODE_ENV == 'production' ? [] : ["./migration/*.ts"]
 
 module.exports = {
     type: 'postgres',
     host: process.env.DB_HOST || 'localhost',
     username: process.env.DB_USERNAME || 'postgres',
-    password: process.env.DB_PASSWORD || 'pppppp',
-    database: process.env.DB_NAME || 'kudos',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'availability',
     port: parseInt(process.env.DB_PORT) || 5432,
     entities: [
         pathToEntities

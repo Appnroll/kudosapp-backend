@@ -2,7 +2,7 @@ import {Controller, Get, HttpCode, Query, Req, Res, UseGuards} from '@nestjs/com
 import {SlackService} from "../services/slack.service";
 import {ApiUseTags} from '@nestjs/swagger';
 import {UserTokenService} from "../services/user-token.service";
-import {AuthGuard} from "../guards/auth.guard";
+import {AuthGuard} from "../../guards/auth.guard";
 
 @Controller('slack')
 @ApiUseTags('slack')

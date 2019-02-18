@@ -1,5 +1,9 @@
-import {CanActivate, ExecutionContext, Injectable} from "@nestjs/common";
-import {UserTokenService} from "../services/user-token.service";
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { Request } from 'express';
+import { SlackToken } from '../kudos/model/slack-token.entity';
+import { UserTokenService } from '../kudos/services/user-token.service';
+
+export type AuthorizedRequest = Request & {userToken: SlackToken};
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -10,16 +14,16 @@ export class AuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const body = request.headers;
-    const auth = body.authorization
+    const auth = body.authorization;
     if (!auth) {
       return false;
     }
 
     const token = auth.split(' ')[1];
-    const userToken = await this.userToken.findUserByToken(token)
+    const userToken = await this.userToken.findUserByToken(token);
 
     if (!userToken) {
-      return false
+      return false;
     }
 
     request.userToken = userToken;

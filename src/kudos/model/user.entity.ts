@@ -1,5 +1,6 @@
-import {Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn} from "typeorm";
-import {UserKudosEntity} from "./user-kudos.entity";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { UserPresentEntity } from '../../availability/model/user-present.entity';
+import { UserKudosEntity } from './user-kudos.entity';
 
 @Entity()
 export class User {
@@ -13,34 +14,34 @@ export class User {
   slackId: string;
 
   @Column({
-    default: ''
+    default: '',
   })
   trelloName: string;
 
   @Column({
-    default: ''
+    default: '',
   })
-  trelloId: string
+  trelloId: string;
 
   @Column()
-  image_24: string
+  image_24: string;
 
   @Column()
-  image_32: string
+  image_32: string;
 
   @Column()
-  image_48: string
+  image_48: string;
 
   @Column()
-  image_72: string
+  image_72: string;
 
   @Column()
-  image_192: string
+  image_192: string;
 
-  @CreateDateColumn({type: 'date'})
+  @CreateDateColumn({ type: 'date' })
   createdAt: Date;
 
-  @UpdateDateColumn({type: 'date'})
+  @UpdateDateColumn({ type: 'date' })
   updatedAt: Date;
 
   @OneToMany(type => UserKudosEntity, userKudos => userKudos.from)
@@ -48,5 +49,10 @@ export class User {
 
   @OneToMany(type => UserKudosEntity, userKudos => userKudos.user)
   userKudos: UserKudosEntity[];
+
+  @OneToMany(type => UserPresentEntity, userPresent => userPresent.user, {
+    eager: true,
+  })
+  userAvailability: UserPresentEntity;
 
 }
