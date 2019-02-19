@@ -1,18 +1,51 @@
 import {ApiModelProperty} from "@nestjs/swagger";
 
+interface ActionType {
+  id: string
+  name: string
+  text: string
+  type: string
+  value: string
+  style: string
+}
+
+export interface FieldType {
+  title: string
+  value: string
+  short: boolean
+}
+
+interface AttachmentData {
+  actions: ActionType[]
+  fields: FieldType[]
+}
+
+export interface PoolAction {
+  name: string,
+  type: string,
+  value: string
+}
+
+export interface PoolActionUser {
+  name: string,
+  id: string
+}
+
 export class PoolActionDto {
   @ApiModelProperty()
-  readonly description: string;
+  readonly user: PoolActionUser
   @ApiModelProperty()
-  readonly channel_id: string;
+  readonly action_ts: string;
   @ApiModelProperty()
-  readonly user_id: string;
+  readonly callback_id: string;
   @ApiModelProperty()
-  readonly user_name: string;
+  readonly message_ts: string;
   @ApiModelProperty()
-  readonly text: string;
+  readonly original_message: { attachments: AttachmentData };
   @ApiModelProperty()
-  readonly response_url: string;
+  readonly channel: { name: string, id: string }
   @ApiModelProperty()
-  readonly trigger_id: string;
+  readonly actions: PoolAction
+
+
 }

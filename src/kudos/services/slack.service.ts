@@ -6,8 +6,8 @@ import {InjectConfig} from 'nestjs-config';
 import {map} from "rxjs/operators";
 import {stringify} from "querystring";
 import {get} from 'lodash'
-import {PoolCreateDto} from "../../pool/dto/pool-create.dto";
-import {PoolData} from "../../pool/services/pool.service";
+import {PoolData, PoolService} from "../../pool/services/pool.service";
+import {PoolActionDto} from "../../pool/dto/pool-action.dto";
 
 @Injectable()
 export class SlackService {
@@ -16,6 +16,7 @@ export class SlackService {
 
   constructor(@InjectRepository(User) private readonly userRepository: Repository<User>,
               @InjectConfig() private readonly config,
+              private readonly poolService: PoolService,
               private readonly httpService: HttpService) {
     this.SLACK_API = this.config.get('slack').slackApi
   }
@@ -113,33 +114,6 @@ export class SlackService {
   }
 
 
-  responseInvalidToken(responseUrl, timeWhenResponseUrlIsAvailable) {
-    this.delayedSlackResponse(responseUrl, timeWhenResponseUrlIsAvailable, {
-      "text": "Ooups, something went wrong!",
-      "response_type": "ephemeral",
-      "attachments": [
-        {
-          "text": "Ask your Slack Admin for more details - Auth issue!"
-        }
-      ]
-    })
-  }
-
-  responseOk(responseUrl, timeWhenResponseUrlIsAvailable) {
-    this.delayedSlackResponse(responseUrl, timeWhenResponseUrlIsAvailable, {
-      "text": "Kudos awarded successfully 👑",
-      "response_type": "ephemeral"
-
-    })
-  }
-
-  responseInvalidUsername(responseUrl, timeWhenResponseUrlIsAvailable) {
-    this.delayedSlackResponse(responseUrl, timeWhenResponseUrlIsAvailable, {
-      "response_type": "ephemeral",
-      "text": "User does not exist, please check name|names!"
-    })
-  }
-
   async sendSlackChatMessage(data: PoolData, channelId: string) {
     const headersRequest = {
       'Content-Type': 'application/json',
@@ -178,6 +152,60 @@ export class SlackService {
     console.log(request.data)
   }
 
+  async updateSlackMessage(data: PoolActionDto) {
+    const headersRequest = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
+    };
+
+    const updatedFieldValue = this.poolService.updateOptionValue(data.actions, data.original_message.attachments.fields, data.user)
+
+    const request = await this.httpService
+      .post(`${this.SLACK_API}/chat.postMessage`,
+        {
+          "channel": `${data.channel.id}`,
+          "ts": `${data.message_ts}`,
+          "attachments": [
+            {
+              "fields": updatedFieldValue,
+              "text": "Pick some option",
+              "callback_id": `${data.callback_id}`,
+              "color": "#3AA3E3",
+              "attachment_type": "default",
+              "actions": data.original_message.attachments.actions
+            }
+          ],
+        }, {headers: headersRequest}).toPromise()
+    console.log('Request response: ')
+    console.log(request.data)
+  }
+
+  responseInvalidToken(responseUrl, timeWhenResponseUrlIsAvailable) {
+    this.delayedSlackResponse(responseUrl, timeWhenResponseUrlIsAvailable, {
+      "text": "Ooups, something went wrong!",
+      "response_type": "ephemeral",
+      "attachments": [
+        {
+          "text": "Ask your Slack Admin for more details - Auth issue!"
+        }
+      ]
+    })
+  }
+
+  responseOk(responseUrl, timeWhenResponseUrlIsAvailable) {
+    this.delayedSlackResponse(responseUrl, timeWhenResponseUrlIsAvailable, {
+      "text": "Kudos awarded successfully 👑",
+      "response_type": "ephemeral"
+
+    })
+  }
+
+  responseInvalidUsername(responseUrl, timeWhenResponseUrlIsAvailable) {
+    this.delayedSlackResponse(responseUrl, timeWhenResponseUrlIsAvailable, {
+      "response_type": "ephemeral",
+      "text": "User does not exist, please check name|names!"
+    })
+  }
 
   delayedSlackResponse(url: string, timeWhenResponseUrlIsAvailable: number, reason: {}) {
     setTimeout(
