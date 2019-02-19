@@ -6,7 +6,7 @@ import {InjectConfig} from 'nestjs-config';
 import {map} from "rxjs/operators";
 import {stringify} from "querystring";
 import {get} from 'lodash'
-import {PoolData, PoolService} from "../../pool/services/pool.service";
+import {PoolData} from "../../pool/services/pool.service";
 import {PoolActionDto} from "../../pool/dto/pool-action.dto";
 
 @Injectable()
@@ -16,7 +16,6 @@ export class SlackService {
 
   constructor(@InjectRepository(User) private readonly userRepository: Repository<User>,
               @InjectConfig() private readonly config,
-              private readonly poolService: PoolService,
               private readonly httpService: HttpService) {
     this.SLACK_API = this.config.get('slack').slackApi
   }
@@ -152,13 +151,11 @@ export class SlackService {
     console.log(request.data)
   }
 
-  async updateSlackMessage(data: PoolActionDto) {
+  async updateSlackMessage(data: PoolActionDto, updatedFieldValue) {
     const headersRequest = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
     };
-
-    const updatedFieldValue = this.poolService.updateOptionValue(data.actions, data.original_message.attachments.fields, data.user)
 
     const request = await this.httpService
       .post(`${this.SLACK_API}/chat.postMessage`,
