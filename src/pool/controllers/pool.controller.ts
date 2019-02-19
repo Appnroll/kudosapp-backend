@@ -16,7 +16,7 @@ export class PoolController {
   @Post()
   async poolCommand(@Body() body: PoolCreateDto, @Res() res) {
     const poolBody: PoolData = this.poolSerivce.extractPoolData(body.text)
-    await this.slackService.sendSlackChatMessage(poolBody)
+    await this.slackService.sendSlackChatMessage(poolBody, body.channel_id)
     res.status(HttpStatus.OK).json();
   }
 
