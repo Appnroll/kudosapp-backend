@@ -158,7 +158,7 @@ export class SlackService {
     };
 
     const request = await this.httpService
-      .post(`${this.SLACK_API}/chat.postMessage`,
+      .post(`${this.SLACK_API}/chat.update`,
         {
           "channel": `${data.channel.id}`,
           "ts": `${data.message_ts}`,
