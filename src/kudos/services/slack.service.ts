@@ -169,7 +169,7 @@ export class SlackService {
               "callback_id": `${data.callback_id}`,
               "color": "#3AA3E3",
               "attachment_type": "default",
-              "actions": data.original_message.attachments.actions
+              "actions": data.original_message.attachments[0].actions
             }
           ],
         }, {headers: headersRequest}).toPromise()
