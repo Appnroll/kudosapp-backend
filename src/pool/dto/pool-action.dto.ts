@@ -16,6 +16,7 @@ export interface FieldType {
 }
 
 interface AttachmentData {
+  text: string
   actions: ActionType[]
   fields: FieldType[]
 }

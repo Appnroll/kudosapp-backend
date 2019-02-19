@@ -24,5 +24,6 @@ export class PoolService {
     } else {
       currentValue.value = `${currentValue.value} ${user.name}`.trim()
     }
+    return values;
   }
 }
