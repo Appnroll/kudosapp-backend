@@ -21,12 +21,8 @@ export class PoolController {
 
   @Post('action')
   async poolAction(@Body() body: DialogPostSlackDto, @Res() res) {
-    console.log(body)
     const payloadBody: PoolActionDto = JSON.parse(body.payload);
-    console.log(payloadBody.original_message)
-    console.log(payloadBody.original_message.attachments)
-    console.log(payloadBody.original_message.attachments.fields)
-    const updatedValues = this.poolService.updateOptionValue(payloadBody.actions, payloadBody.original_message.attachments.fields, payloadBody.user)
+    const updatedValues = this.poolService.updateOptionValue(payloadBody.actions[0], payloadBody.original_message.attachments[0].fields, payloadBody.user)
     await this.slackService.updateSlackMessage(payloadBody, updatedValues)
     res.status(HttpStatus.OK).json();
   }

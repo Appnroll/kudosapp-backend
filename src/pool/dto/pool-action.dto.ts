@@ -41,11 +41,11 @@ export class PoolActionDto {
   @ApiModelProperty()
   readonly message_ts: string;
   @ApiModelProperty()
-  readonly original_message: { attachments: AttachmentData };
+  readonly original_message: { attachments: AttachmentData[] };
   @ApiModelProperty()
   readonly channel: { name: string, id: string }
   @ApiModelProperty()
-  readonly actions: PoolAction
+  readonly actions: PoolAction[]
 
 
 }

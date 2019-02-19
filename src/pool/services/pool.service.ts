@@ -17,18 +17,12 @@ export class PoolService {
   }
 
   updateOptionValue(selectedValue: PoolAction, values: FieldType[], user: PoolActionUser) {
-
-    console.log(selectedValue)
-    console.log(values)
-    console.log(user)
-
     const index = Number(selectedValue.value);
     const currentValue = values[index];
-
     if (currentValue.value.indexOf(user.name) >= 0) {
       currentValue.value.replace(user.name, '')
     } else {
-      currentValue.value = `${currentValue.value} ${user.name}`
+      currentValue.value = `${currentValue.value} ${user.name}`.trim()
     }
   }
 }
