@@ -4,17 +4,19 @@ import {PoolCreateDto} from "../dto/pool-create.dto";
 import {SlackService} from "../../kudos/services/slack.service";
 import {DialogPostSlackDto, PayloadClass} from "../../kudos/dto/dialog-post-slack.dto";
 import {PoolActionDto} from "../dto/pool-action.dto";
+import {PoolData, PoolService} from "../services/pool.service";
 
 @Controller('pool')
 export class PoolController {
 
-  constructor(private slackService: SlackService) {
+  constructor(private slackService: SlackService, private poolSerivce: PoolService) {
 
   }
 
   @Post()
   async poolCommand(@Body() body: PoolCreateDto, @Res() res) {
-    await this.slackService.sendSlackChatMessage(body)
+    const poolBody: PoolData = this.poolSerivce.extractPoolData(body.text)
+    await this.slackService.sendSlackChatMessage(poolBody)
     res.status(HttpStatus.OK).json();
   }
 

@@ -7,6 +7,7 @@ import {map} from "rxjs/operators";
 import {stringify} from "querystring";
 import {get} from 'lodash'
 import {PoolCreateDto} from "../../pool/dto/pool-create.dto";
+import {PoolData} from "../../pool/services/pool.service";
 
 @Injectable()
 export class SlackService {
@@ -139,64 +140,37 @@ export class SlackService {
     })
   }
 
-  async sendSlackChatMessage(data: PoolCreateDto) {
+  async sendSlackChatMessage(data: PoolData, channelId: string) {
     const headersRequest = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
     };
 
-    console.log(data.channel_id);
+    console.log(channelId);
 
     const request = await this.httpService
       .post(`${this.SLACK_API}/chat.postMessage`,
         {
-          "channel": `${data.channel_id}`,
+          "channel": `${channelId}`,
           "attachments": [
             {
-              "fields": [
-                {
-                  "title": "Value1",
-                  "value": "@kgajowy",
-                  "short": false
-                },
-                {
-                  "title": "Value2",
-                  "value": "@kgajowy",
-                  "short": false
-                },
-                {
-                  "title": "Value3",
-                  "value": "@dota",
-                  "short": false
-                }
-              ],
+              "fields": data.options.map((el, i) => ({
+                title: `${i} - ${el}`,
+                value: "",
+                short: false
+              })),
               "text": "Pick some option",
-              "callback_id": "button_tutorial",
+              "callback_id": `button_tutorial-${Math.random().toString(36).substring(7)}`,
               "color": "#3AA3E3",
               "attachment_type": "default",
-              "actions": [
-                {
-                  "name": "pool",
-                  "text": ":three:",
-                  "style": "danger",
-                  "type": "button",
-                  "value": "something1"
-                },
-                {
-                  "name": "pool",
-                  "text": ":two:",
-                  "style": "danger",
-                  "type": "button",
-                  "value": "something2"
-                },
-                {
-                  "name": "pool",
-                  "text": ":one:",
-                  "style": "danger",
-                  "type": "button",
-                  "value": "something3"
-                }
-              ]
+              "actions":
+                data.options.map((el, i) => ({
+                  name: "pool",
+                  text: `${i}`,
+                  style: "danger",
+                  type: "button",
+                  value: `${i}`
+                }))
             }
           ],
         }, {headers: headersRequest}).toPromise()
