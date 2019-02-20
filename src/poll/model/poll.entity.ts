@@ -6,7 +6,7 @@ export class Kudos {
   id: number;
 
   @Column('text')
-  poolId: string;
+  pollId: string;
 
   @Column('text')
   title: string;

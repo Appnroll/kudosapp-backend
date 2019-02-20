@@ -2,8 +2,8 @@ import {Module} from '@nestjs/common';
 import {KudosModule} from './kudos/kudos.module';
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {ConfigModule, ConfigService} from "nestjs-config";
-import { AvailabilityModule } from './availability/availability.module';
-import { PoolModule } from './pool/pool.module';
+import {AvailabilityModule} from './availability/availability.module';
+import {PollModule} from './poll/poll.module';
 import * as path from 'path';
 
 const pathToConfiguration = process.env.NODE_ENV == 'production' ? 'config/**/*.js' : 'config/**/*.{ts,js}';
@@ -17,7 +17,7 @@ const pathToConfiguration = process.env.NODE_ENV == 'production' ? 'config/**/*.
       inject: [ConfigService],
     }),
     AvailabilityModule,
-    PoolModule
+    PollModule
   ],
   providers: [],
 })

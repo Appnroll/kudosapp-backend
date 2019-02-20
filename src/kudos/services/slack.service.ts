@@ -6,8 +6,8 @@ import {InjectConfig} from 'nestjs-config';
 import {map} from "rxjs/operators";
 import {stringify} from "querystring";
 import {get} from 'lodash'
-import {PoolData} from "../../pool/services/pool.service";
-import {PoolActionDto} from "../../pool/dto/pool-action.dto";
+import {PollData} from "../../poll/services/poll.service";
+import {PollActionDto} from "../../poll/dto/poll-action.dto";
 
 @Injectable()
 export class SlackService {
@@ -108,18 +108,14 @@ export class SlackService {
             ]
           }
         }, {headers: headersRequest}).toPromise()
-    console.log('Request response: ')
-    console.log(request.data)
   }
 
 
-  async sendSlackChatMessage(data: PoolData, channelId: string) {
+  async sendSlackChatMessage(data: PollData, channelId: string) {
     const headersRequest = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
     };
-
-    console.log(channelId);
 
     const request = await this.httpService
       .post(`${this.SLACK_API}/chat.postMessage`,
@@ -147,11 +143,9 @@ export class SlackService {
             }
           ],
         }, {headers: headersRequest}).toPromise()
-    console.log('Request response: ')
-    console.log(request.data)
   }
 
-  async updateSlackMessage(data: PoolActionDto, updatedFieldValue) {
+  async updateSlackMessage(data: PollActionDto, updatedFieldValue) {
     const headersRequest = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
@@ -173,8 +167,6 @@ export class SlackService {
             }
           ],
         }, {headers: headersRequest}).toPromise()
-    console.log('Request response: ')
-    console.log(request.data)
   }
 
   responseInvalidToken(responseUrl, timeWhenResponseUrlIsAvailable) {

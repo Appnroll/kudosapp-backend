@@ -21,7 +21,7 @@ interface AttachmentData {
   fields: FieldType[]
 }
 
-export interface PoolAction {
+export interface PollAction {
   name: string,
   type: string,
   value: string
@@ -32,7 +32,7 @@ export interface PoolActionUser {
   id: string
 }
 
-export class PoolActionDto {
+export class PollActionDto {
   @ApiModelProperty()
   readonly user: PoolActionUser
   @ApiModelProperty()
@@ -46,7 +46,7 @@ export class PoolActionDto {
   @ApiModelProperty()
   readonly channel: { name: string, id: string }
   @ApiModelProperty()
-  readonly actions: PoolAction[]
+  readonly actions: PollAction[]
 
 
 }

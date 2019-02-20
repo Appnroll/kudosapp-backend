@@ -14,10 +14,10 @@ import {TrelloController} from './controllers/trello.controller';
 import {UserTokenService} from './services/user-token.service';
 import {SlackToken} from "./model/slack-token.entity";
 import {DateService} from './services/date.service';
-import {PoolModule} from "../pool/pool.module";
+import {PollModule} from "../poll/poll.module";
 
 @Module({
-  imports: [PoolModule, TypeOrmModule.forFeature([Kudos, User, UserKudosEntity, SlackToken, UserPresentEntity]), HttpModule],
+  imports: [PollModule, TypeOrmModule.forFeature([Kudos, User, UserKudosEntity, SlackToken, UserPresentEntity]), HttpModule],
   controllers: [KudosController, SlackController, TrelloController],
   providers: [KudosService, SlackService, UserService, TrelloService, UserTokenService, DateService]
 })
