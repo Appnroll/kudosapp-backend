@@ -130,7 +130,7 @@ export class SlackService {
           })),
           "text": `${data.question}`,
           "callback_id": `button_tutorial-${Math.random().toString(36).substring(7)}`,
-          "color": "#3AA3E3",
+          "color": "#ff8566",
           "attachment_type": "default",
           "actions":
             data.options.map((el, i) => ({
