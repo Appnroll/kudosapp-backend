@@ -33,7 +33,9 @@ export class PollService {
       currentValue.value = `${currentValue.value} ${user.name}`.replace(/\s+/g, " ").trim()
     }
     if (currentValue.value !== "") {
-      currentValue.title = `${currentValue.title} (\`${currentValue.value.split('').length} \` `;
+      currentValue.title = `${currentValue.title} (\`${currentValue.value.split('').length} \`)`;
+    } else {
+      currentValue.title = currentValue.title.replace(/[(.*?)]/, '')
     }
     return values;
   }
