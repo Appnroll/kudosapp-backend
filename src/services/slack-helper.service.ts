@@ -24,7 +24,7 @@ export class SlackHelperService {
 
   getSlackNumberEmoji(value: number) {
     const stringedNumber = value.toString().split('')
-    stringedNumber.reduce((acc, val) => {
+    return stringedNumber.reduce((acc, val) => {
       return acc + NUMBER_EMOJI_MAP[val]
     }, "")
   }

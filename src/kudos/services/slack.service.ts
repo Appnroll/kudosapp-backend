@@ -119,32 +119,36 @@ export class SlackService {
       'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
     };
 
-    await this.httpService
-      .post(`${this.SLACK_API}/chat.postMessage`,
+    const requestData = {
+      "channel": `${channelId}`,
+      "attachments": [
         {
-          "channel": `${channelId}`,
-          "attachments": [
-            {
-              "fields": data.options.map((el, i) => ({
-                title: `${this.slackHelperService.getSlackNumberEmoji(i)} - ${el}`,
-                value: "",
-                short: false
-              })),
-              "text": `${data.question}`,
-              "callback_id": `button_tutorial-${Math.random().toString(36).substring(7)}`,
-              "color": "#3AA3E3",
-              "attachment_type": "default",
-              "actions":
-                data.options.map((el, i) => ({
-                  name: "pool",
-                  text: `${this.slackHelperService.getSlackNumberEmoji(i)}`,
-                  style: "danger",
-                  type: "button",
-                  value: `${i}`
-                }))
-            }
-          ],
-        }, {headers: headersRequest}).toPromise()
+          "fields": data.options.map((el, i) => ({
+            title: `${this.slackHelperService.getSlackNumberEmoji(i)} - ${el}`,
+            value: "",
+            short: false
+          })),
+          "text": `${data.question}`,
+          "callback_id": `button_tutorial-${Math.random().toString(36).substring(7)}`,
+          "color": "#3AA3E3",
+          "attachment_type": "default",
+          "actions":
+            data.options.map((el, i) => ({
+              name: "pool",
+              text: `${this.slackHelperService.getSlackNumberEmoji(i)}`,
+              style: "danger",
+              type: "button",
+              value: `${i}`
+            }))
+        }
+      ],
+    }
+
+    console.log('req')
+    console.log(requestData.attachments[0].fields)
+    console.log(requestData.attachments[0].actions)
+
+    await this.httpService.post(`${this.SLACK_API}/chat.postMessage`, requestData, {headers: headersRequest}).toPromise()
   }
 
   async updateSlackMessage(data: PollActionDto, updatedFieldValue) {
