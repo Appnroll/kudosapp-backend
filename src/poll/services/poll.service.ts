@@ -24,19 +24,31 @@ export class PollService {
     const currentValue = values[index];
 
     if (currentValue.value.indexOf(user.name) >= 0) {
-      currentValue.value = currentValue.value.replace(user.name, '').trimRight()
+      currentValue.value = this.removeWord(currentValue.value, user.name).trimRight()
     } else {
-      currentValue.value = `${currentValue.value} ${user.name}`.replace(/\s+/g, " ").trim()
+      currentValue.value = this.clearAdditionalSpaces(`${currentValue.value} ${user.name}`)
     }
 
-    currentValue.title = currentValue.title.replace(/\(.*\)/, "")
+    currentValue.title = this.clearTitle(currentValue.title)
 
     if (currentValue.value !== "") {
       currentValue.title = `${currentValue.title} (\`${currentValue.value.split(' ').length}\`)`;
     }
 
-    currentValue.title = currentValue.title.replace(/\s+/g, " ");
-
+    currentValue.title = this.clearAdditionalSpaces(currentValue.title)
     return values;
   }
+
+  clearAdditionalSpaces(str: string) {
+    return str.replace(/\s+/g, " ").trim()
+  }
+
+  removeWord(str: string, word: string) {
+    return str.replace(word, '')
+  }
+
+  clearTitle(str: string){
+    return str.replace(/\(.*\)/, "");
+  }
+
 }
