@@ -144,10 +144,6 @@ export class SlackService {
       ],
     }
 
-    console.log('req')
-    console.log(requestData.attachments[0].fields)
-    console.log(requestData.attachments[0].actions)
-
     await this.httpService.post(`${this.SLACK_API}/chat.postMessage`, requestData, {headers: headersRequest}).toPromise()
   }
 
