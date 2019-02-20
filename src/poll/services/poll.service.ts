@@ -36,7 +36,7 @@ export class PollService {
     if (currentValue.value !== "") {
       currentValue.title = `${currentValue.title} (\`${currentValue.value.split(' ').length}\`)`;
     } else {
-      currentValue.title = currentValue.title.replace(/([^]]+)/, '')
+      currentValue.title = currentValue.title.replace(/([^]+)/, '')
     }
 
     return values;
