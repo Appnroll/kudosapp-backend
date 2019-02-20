@@ -22,8 +22,9 @@ export class PollService {
   updateOptionValue(selectedValue: PollAction, values: FieldType[], user: PoolActionUser) {
     const index = Number(selectedValue.value);
     const currentValue = values[index];
+
     if (currentValue.value.indexOf(user.name) >= 0) {
-      currentValue.value = currentValue.value.replace(user.name, '')
+      currentValue.value = currentValue.value.replace(user.name, '').trimRight()
     } else {
       currentValue.value = `${currentValue.value} ${user.name}`.replace(/\s+/g, " ").trim()
     }
