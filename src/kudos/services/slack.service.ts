@@ -8,6 +8,7 @@ import {stringify} from "querystring";
 import {get} from 'lodash'
 import {PollData} from "../../poll/services/poll.service";
 import {PollActionDto} from "../../poll/dto/poll-action.dto";
+import {SlackHelperService} from "../../services/slack-helper.service";
 
 @Injectable()
 export class SlackService {
@@ -16,6 +17,7 @@ export class SlackService {
 
   constructor(@InjectRepository(User) private readonly userRepository: Repository<User>,
               @InjectConfig() private readonly config,
+              private readonly slackHelperService: SlackHelperService,
               private readonly httpService: HttpService) {
     this.SLACK_API = this.config.get('slack').slackApi
   }
@@ -51,7 +53,7 @@ export class SlackService {
       .toPromise();
   }
 
-  async fetchAvatars() {
+  async fetchUsersWithAvatars() {
     const req: any = await this.httpService.get(`${this.SLACK_API}/users.list?token=${this.config.get('slack').slackOAuthToken}`).toPromise()
     const users = get(req, 'data.members', []).map(el => ({
       name: el.name,
@@ -117,14 +119,14 @@ export class SlackService {
       'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
     };
 
-    const request = await this.httpService
+    await this.httpService
       .post(`${this.SLACK_API}/chat.postMessage`,
         {
           "channel": `${channelId}`,
           "attachments": [
             {
               "fields": data.options.map((el, i) => ({
-                title: `${i} - ${el}`,
+                title: `${this.slackHelperService.getSlackNumberEmoji(i)} - ${el}`,
                 value: "",
                 short: false
               })),
@@ -135,7 +137,7 @@ export class SlackService {
               "actions":
                 data.options.map((el, i) => ({
                   name: "pool",
-                  text: `${i}`,
+                  text: `${this.slackHelperService.getSlackNumberEmoji(i)}`,
                   style: "danger",
                   type: "button",
                   value: `${i}`
@@ -151,7 +153,7 @@ export class SlackService {
       'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
     };
 
-    const request = await this.httpService
+    await this.httpService
       .post(`${this.SLACK_API}/chat.update`,
         {
           "channel": `${data.channel.id}`,
@@ -168,49 +170,5 @@ export class SlackService {
           ],
         }, {headers: headersRequest}).toPromise()
   }
-
-  responseInvalidToken(responseUrl, timeWhenResponseUrlIsAvailable) {
-    this.delayedSlackResponse(responseUrl, timeWhenResponseUrlIsAvailable, {
-      "text": "Ooups, something went wrong!",
-      "response_type": "ephemeral",
-      "attachments": [
-        {
-          "text": "Ask your Slack Admin for more details - Auth issue!"
-        }
-      ]
-    })
-  }
-
-  responseOk(responseUrl, timeWhenResponseUrlIsAvailable) {
-    this.delayedSlackResponse(responseUrl, timeWhenResponseUrlIsAvailable, {
-      "text": "Kudos awarded successfully 👑",
-      "response_type": "ephemeral"
-
-    })
-  }
-
-  responseInvalidUsername(responseUrl, timeWhenResponseUrlIsAvailable) {
-    this.delayedSlackResponse(responseUrl, timeWhenResponseUrlIsAvailable, {
-      "response_type": "ephemeral",
-      "text": "User does not exist, please check name|names!"
-    })
-  }
-
-  delayedSlackResponse(url: string, timeWhenResponseUrlIsAvailable: number, reason: {}) {
-    setTimeout(
-      () => (
-        this.httpService.post(url, reason, {headers: {'content-type': 'application/json'}})
-          .toPromise()
-          .then()
-          .catch(console.log)
-      ),
-      Math.max(timeWhenResponseUrlIsAvailable - new Date().getTime(), 0)
-    )
-  }
-
-  getSlackResponseDelay() {
-    return new Date().getTime() + 3001;
-  }
-
 
 }

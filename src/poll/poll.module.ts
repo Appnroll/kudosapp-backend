@@ -6,11 +6,12 @@ import {User} from "../kudos/model/user.entity";
 import {TypeOrmModule} from '@nestjs/typeorm';
 import {UserPresentEntity} from "../availability/model/user-present.entity";
 import {PollService} from './services/poll.service';
+import {SlackHelperService} from "../services/slack-helper.service";
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, UserPresentEntity]), HttpModule],
   controllers: [PollController],
-  providers: [SlackService, UserService, PollService],
+  providers: [SlackService, UserService, PollService, SlackHelperService],
   exports: [PollService]
 })
 export class PollModule {

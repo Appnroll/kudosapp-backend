@@ -7,11 +7,12 @@ import { UserTokenService } from '../kudos/services/user-token.service';
 import { UserService } from '../kudos/services/user.service';
 import { AvailabilityController } from './controllers/availability.controller';
 import { UserPresentEntity } from './model/user-present.entity';
+import {SlackHelperService} from "../services/slack-helper.service";
 
 @Module({
   controllers: [AvailabilityController],
   imports: [TypeOrmModule.forFeature([User, UserPresentEntity, SlackToken]), HttpModule],
-  providers: [SlackService, UserService, UserTokenService],
+  providers: [SlackService, UserService, UserTokenService, SlackHelperService],
 })
 export class AvailabilityModule {
 }
