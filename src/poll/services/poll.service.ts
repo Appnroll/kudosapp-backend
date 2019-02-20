@@ -34,6 +34,8 @@ export class PollService {
       currentValue.title = `${currentValue.title} (\`${currentValue.value.split(' ').length}\`)`;
     }
 
+    currentValue.title = currentValue.title.replace(/\s+/g, " ");
+
     return values;
   }
 }
