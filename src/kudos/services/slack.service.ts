@@ -136,7 +136,6 @@ export class SlackService {
             data.options.map((el, i) => ({
               name: "pool",
               text: `${this.slackHelperService.getSlackNumberEmoji(i)}`,
-              style: "danger",
               type: "button",
               value: `${i}`
             }))

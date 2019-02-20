@@ -1,7 +1,5 @@
 import {Injectable} from '@nestjs/common';
 import {FieldType, PollAction, PoolActionUser} from "../dto/poll-action.dto";
-import {SlackService} from "../../kudos/services/slack.service";
-import {SlackHelperService} from "../../services/slack-helper.service";
 
 export interface PollData {
   question: string;
@@ -10,12 +8,9 @@ export interface PollData {
 
 @Injectable()
 export class PollService {
-
-
-  constructor(private readonly slackService: SlackService, private readonly slackHelperService: SlackHelperService) {
+  constructor() {
 
   }
-
 
   extractPollData(text: string): PollData {
     const [question, ...options] = text.split(';')
@@ -33,10 +28,10 @@ export class PollService {
       currentValue.value = `${currentValue.value} ${user.name}`.replace(/\s+/g, " ").trim()
     }
 
+    currentValue.title = currentValue.title.replace(/\(.*\)/, "")
+
     if (currentValue.value !== "") {
       currentValue.title = `${currentValue.title} (\`${currentValue.value.split(' ').length}\`)`;
-    } else {
-      currentValue.title = currentValue.title.replace(/\(.*\)/, "")
     }
 
     return values;
