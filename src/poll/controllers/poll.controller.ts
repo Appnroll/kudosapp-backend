@@ -21,6 +21,7 @@ export class PollController {
 
   @Post('action')
   async pollAction(@Body() body: DialogPostSlackDto, @Res() res) {
+    console.log(body)
     const payloadBody: PollActionDto = JSON.parse(body.payload);
     const updatedValues = this.pollService.updateOptionValue(payloadBody.actions[0], payloadBody.original_message.attachments[0].fields, payloadBody.user)
     await this.slackService.updateSlackMessage(payloadBody, updatedValues)
