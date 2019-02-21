@@ -69,7 +69,8 @@ export class PollService {
       ],
     }
 
-    await this.httpService.post(`${this.SLACK_API}/chat.postMessage`, requestData, {headers: headersRequest}).toPromise()
+    const req = await this.httpService.post(`${this.SLACK_API}/chat.postMessage`, requestData, {headers: headersRequest}).toPromise()
+    console.log(req.data)
   }
 
   async updateSlackMessage(data: UpdateMessageActionDto, updatedFieldValue) {
@@ -78,7 +79,7 @@ export class PollService {
       'Authorization': `Bearer ${process.env.POOL_SLACK_AUTH_TOKEN}`
     };
 
-    await this.httpService
+    const req = await this.httpService
       .post(`${this.SLACK_API}/chat.update`,
         {
           "channel": `${data.channel.id}`,
@@ -94,6 +95,9 @@ export class PollService {
             }
           ],
         }, {headers: headersRequest}).toPromise()
+
+
+    console.log(req.data)
   }
 
   async openPollDialog(triggerId) {
@@ -148,8 +152,9 @@ export class PollService {
       }
     }
 
-    await this.httpService
+    const req = await this.httpService
       .post(`${this.SLACK_API}/dialog.open`, requestData, {headers: headersRequest}).toPromise()
+    console.log(req.data)
   }
 
   updateOptionValue(selectedValue: PollAction, values: FieldType[], user: PoolActionUser) {
