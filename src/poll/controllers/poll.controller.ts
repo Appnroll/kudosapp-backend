@@ -30,6 +30,9 @@ export class PollController {
   async pollAction(@Body() body: SlackActionDto, @Res() res) {
     console.log(body)
     const payloadBody: any = body.payload
+
+    console.log(payloadBody)
+
     const actionType = payloadBody.callback_id;
 
     console.log(actionType)
