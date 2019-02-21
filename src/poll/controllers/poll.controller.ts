@@ -36,6 +36,7 @@ export class PollController {
     const actionType = payloadBody.callback_id;
 
     console.log(actionType)
+    console.log(payloadBody['callback_id'])
 
     switch (actionType) {
       case SLACK_ACTION_TYPES.POLL_CREATE_POLL: {
