@@ -69,7 +69,8 @@ export class PollService {
       ],
     }
 
-    await this.httpService.post(`${this.SLACK_API}/chat.postMessage`, requestData, {headers: headersRequest}).toPromise()
+    const req = await this.httpService.post(`${this.SLACK_API}/chat.postMessage`, requestData, {headers: headersRequest}).toPromise()
+    console.log(req.data)
   }
 
   async updateSlackMessage(data: UpdateMessageActionDto, updatedFieldValue) {

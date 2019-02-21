@@ -34,6 +34,7 @@ export class PollController {
 
     switch (actionType) {
       case SLACK_ACTION_TYPES.POLL_CREATE_POLL: {
+        console.log('here1')
         const pollBody: PollData = this.pollService.extractPollDataFromDialog(payloadBody)
         await this.pollService.sendSlackChatMessage(pollBody, payloadBody.channel.id)
         break;
