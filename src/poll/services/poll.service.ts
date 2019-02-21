@@ -35,7 +35,7 @@ export class PollService {
   extractPollDataFromDialog({submission}: CreatePollActionDto): PollData {
     const {question, ...rest} = submission
     return {
-      question: question.trim(), options: Object.values(rest)
+      question: question.trim(), options: Object.values(rest).filter(el => el != null)
     }
   }
 
