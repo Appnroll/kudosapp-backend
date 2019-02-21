@@ -3,7 +3,7 @@ import {PollCreateDto} from "../dto/poll-create.dto";
 import {SlackService} from "../../kudos/services/slack.service";
 import {DialogPostSlackDto} from "../../kudos/dto/dialog-post-slack.dto";
 import {PollActionDto} from "../dto/poll-action.dto";
-import {PollService} from "../services/poll.service";
+import {PollData, PollService} from "../services/poll.service";
 import {SLACK_ACTION_TYPES} from "../../services/slack-helper.service";
 
 @Controller('poll')
@@ -14,9 +14,14 @@ export class PollController {
 
   @Post()
   async pollCommand(@Body() body: PollCreateDto, @Res() res) {
-    // const poolBody: PollData = this.pollService.extractPollData(body.text)
-    // await this.pollService.sendSlackChatMessage(poolBody, body.channel_id)
     await this.pollService.openPollDialog(body.trigger_id)
+    res.status(HttpStatus.OK).json();
+  }
+
+  @Post('multiPoll')
+  async multiPoll(@Body() body: PollCreateDto, @Res() res) {
+    const poolBody: PollData = this.pollService.extractPollData(body.text)
+    await this.pollService.sendSlackChatMessage(poolBody, body.channel_id)
     res.status(HttpStatus.OK).json();
   }
 
