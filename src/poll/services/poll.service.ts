@@ -120,13 +120,11 @@ export class PollService {
             "type": "text",
             "label": "Answer 1",
             "name": "option1",
-            "optional": "true"
           },
           {
             "type": "text",
             "label": "Answer 2",
             "name": "option2",
-            "optional": "true"
           },
           {
             "type": "text",
