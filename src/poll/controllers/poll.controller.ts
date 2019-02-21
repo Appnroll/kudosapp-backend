@@ -30,6 +30,9 @@ export class PollController {
   async pollAction(@Body() body: SlackActionDto, @Res() res) {
     const payloadBody: CreatePollActionDto & UpdateMessageActionDto = JSON.parse(body.payload);
     const actionType = payloadBody.callback_id;
+
+    console.log(payloadBody.callback_id)
+
     switch (actionType) {
       case SLACK_ACTION_TYPES.POLL_CREATE_POLL: {
         console.log('here1')
@@ -38,6 +41,8 @@ export class PollController {
         break;
       }
       case SLACK_ACTION_TYPES.POLL_ANSWER: {
+        console.log('here2')
+        console.log(payloadBody)
         const updatedValues = this.pollService.updateOptionValue(payloadBody.actions[0], payloadBody.original_message.attachments[0].fields, payloadBody.user)
         await this.pollService.updateSlackMessage(payloadBody, updatedValues)
         break;
