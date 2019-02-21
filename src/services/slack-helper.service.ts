@@ -3,7 +3,7 @@ import {HttpService, Injectable} from '@nestjs/common';
 export const enum SLACK_ACTION_TYPES {
   KUDOS_OPEN_DIALOG = 'kudos-open-dialog',
   POLL_ANSWER = 'poll-answer',
-  POLL_CREATE_POLL = 'poll-create-answer',
+  POLL_CREATE_POLL = 'poll-create-poll',
   POLL_OPEN_DIALOG = 'poll-open-dialog',
 }
 
