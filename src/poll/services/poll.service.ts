@@ -106,7 +106,7 @@ export class PollService {
     const requestData = {
       "trigger_id": `${triggerId}`,
       "dialog": {
-        "callback_id": `${SLACK_ACTION_TYPES.POLL_OPEN_DIALOG}`,
+        "callback_id": `${SLACK_ACTION_TYPES.POLL_CREATE_POLL}`,
         "title": "Create poll",
         "submit_label": "OK",
         "notify_on_cancel": false,
