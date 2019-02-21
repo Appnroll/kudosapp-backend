@@ -55,7 +55,7 @@ export class PollService {
             short: false
           })),
           "text": `${data.question}`,
-          "callback_id": `${SLACK_ACTION_TYPES.POLL_CREATE_POLL}`,
+          "callback_id": `${SLACK_ACTION_TYPES.POLL_ANSWER}`,
           "color": "#ff8566",
           "attachment_type": "default",
           "actions":
