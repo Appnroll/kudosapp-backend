@@ -69,8 +69,7 @@ export class PollService {
       ],
     }
 
-    const req = await this.httpService.post(`${this.SLACK_API}/chat.postMessage`, requestData, {headers: headersRequest}).toPromise()
-    console.log(req.data)
+    await this.httpService.post(`${this.SLACK_API}/chat.postMessage`, requestData, {headers: headersRequest}).toPromise()
   }
 
   async updateSlackMessage(data: UpdateMessageActionDto, updatedFieldValue) {
@@ -120,27 +119,32 @@ export class PollService {
           {
             "type": "text",
             "label": "Answer 1",
-            "name": "option1"
+            "name": "option1",
+            "optional": "true"
           },
           {
             "type": "text",
             "label": "Answer 2",
-            "name": "option2"
+            "name": "option2",
+            "optional": "true"
           },
           {
             "type": "text",
             "label": "Answer 3",
-            "name": "option3"
+            "name": "option3",
+            "optional": "true"
           },
           {
             "type": "text",
             "label": "Answer 4",
-            "name": "option4"
+            "name": "option4",
+            "optional": "true"
           },
           {
             "type": "text",
             "label": "Answer 5",
-            "name": "option5"
+            "name": "option5",
+            "optional": "true"
           }
         ]
       }
