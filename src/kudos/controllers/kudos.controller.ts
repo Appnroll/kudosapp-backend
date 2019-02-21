@@ -174,7 +174,7 @@ export class KudosController {
     type: {},
   })
   async singleKudo(@Body() body: SingleKudosSlackDto): Promise<void> {
-    await this.slackService.openSlackDialog(body.trigger_id);
+    await this.slackService.openKudoSlackDialog(body.trigger_id);
   }
 
   @Post('slack')

@@ -6,8 +6,6 @@ import {InjectConfig} from 'nestjs-config';
 import {map} from "rxjs/operators";
 import {stringify} from "querystring";
 import {get} from 'lodash'
-import {PollData} from "../../poll/services/poll.service";
-import {PollActionDto} from "../../poll/dto/poll-action.dto";
 import {SlackHelperService} from "../../services/slack-helper.service";
 
 @Injectable()
@@ -78,96 +76,38 @@ export class SlackService {
     await this.httpService.get(`${this.SLACK_API}/auth.revoke?${paramsQueryString}`, {headers: headersRequest}).toPromise()
   }
 
-
-  async openSlackDialog(triggerId) {
+  async openKudoSlackDialog(triggerId) {
     const headersRequest = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
     };
     console.log(`Opening slack dialog window, trigger_id: ${triggerId}`)
-    const request = await this.httpService
-      .post(`${this.SLACK_API}/dialog.open`,
-        {
-          "trigger_id": `${triggerId}`,
-          "dialog": {
-            "callback_id": `kudos-${Math.random().toString(36).substring(7)}`,
-            "title": "Give kudo!",
-            "submit_label": "OK",
-            "notify_on_cancel": false,
-            "elements": [
-              {
-                "label": "Give kudos to:",
-                "name": "kudos_given",
-                "type": "select",
-                "data_source": "users"
-              },
-              {
-                "label": "Description",
-                "name": "description",
-                "type": "textarea",
-                "hint": "Give short kudo description!"
-              }
-            ]
-          }
-        }, {headers: headersRequest}).toPromise()
-  }
-
-
-  async sendSlackChatMessage(data: PollData, channelId: string) {
-    const headersRequest = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
-    };
 
     const requestData = {
-      "channel": `${channelId}`,
-      "attachments": [
-        {
-          "fields": data.options.map((el, i) => ({
-            title: `${this.slackHelperService.getSlackNumberEmoji(i)} - ${el}`,
-            value: "",
-            short: false
-          })),
-          "text": `${data.question}`,
-          "callback_id": `button_tutorial-${Math.random().toString(36).substring(7)}`,
-          "color": "#ff8566",
-          "attachment_type": "default",
-          "actions":
-            data.options.map((el, i) => ({
-              name: "pool",
-              text: `${this.slackHelperService.getSlackNumberEmoji(i)}`,
-              type: "button",
-              value: `${i}`
-            }))
-        }
-      ],
+      "trigger_id": `${triggerId}`,
+      "dialog": {
+        "callback_id": `kudos-open-dialog`,
+        "title": "Give kudo!",
+        "submit_label": "OK",
+        "notify_on_cancel": false,
+        "elements": [
+          {
+            "label": "Give kudos to:",
+            "name": "kudos_given",
+            "type": "select",
+            "data_source": "users"
+          },
+          {
+            "label": "Description",
+            "name": "description",
+            "type": "textarea",
+            "hint": "Give short kudo description!"
+          }
+        ]
+      }
     }
 
-    await this.httpService.post(`${this.SLACK_API}/chat.postMessage`, requestData, {headers: headersRequest}).toPromise()
-  }
-
-  async updateSlackMessage(data: PollActionDto, updatedFieldValue) {
-    const headersRequest = {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
-    };
-
     await this.httpService
-      .post(`${this.SLACK_API}/chat.update`,
-        {
-          "channel": `${data.channel.id}`,
-          "ts": `${data.message_ts}`,
-          "attachments": [
-            {
-              "fields": updatedFieldValue,
-              "text": data.original_message.attachments[0].text,
-              "callback_id": `${data.callback_id}`,
-              "color": "#ff8566",
-              "attachment_type": "default",
-              "actions": data.original_message.attachments[0].actions
-            }
-          ],
-        }, {headers: headersRequest}).toPromise()
+      .post(`${this.SLACK_API}/dialog.open`, requestData, {headers: headersRequest}).toPromise()
   }
-
 }

@@ -1,5 +1,7 @@
-import {Injectable} from '@nestjs/common';
-import {FieldType, PollAction, PoolActionUser} from "../dto/poll-action.dto";
+import {HttpService, Injectable} from '@nestjs/common';
+import {FieldType, PollAction, PollActionDto, PoolActionUser} from "../dto/poll-action.dto";
+import {SlackHelperService} from "../../services/slack-helper.service";
+import {InjectConfig} from 'nestjs-config';
 
 export interface PollData {
   question: string;
@@ -8,8 +10,13 @@ export interface PollData {
 
 @Injectable()
 export class PollService {
-  constructor() {
 
+  SLACK_API: string;
+
+  constructor(@InjectConfig() private readonly config,
+              private readonly slackHelperService: SlackHelperService,
+              private readonly httpService: HttpService) {
+    this.SLACK_API = this.config.get('slack').slackApi
   }
 
   extractPollData(text: string): PollData {
@@ -17,6 +24,116 @@ export class PollService {
     return {
       question: question.trim(), options: options.map(el => el.trim())
     }
+  }
+
+  async sendSlackChatMessage(data: PollData, channelId: string) {
+    const headersRequest = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
+    };
+
+    const requestData = {
+      "channel": `${channelId}`,
+      "attachments": [
+        {
+          "fields": data.options.map((el, i) => ({
+            title: `${this.slackHelperService.getSlackNumberEmoji(i)} - ${el}`,
+            value: "",
+            short: false
+          })),
+          "text": `${data.question}`,
+          "callback_id": `poll-answer`,
+          "color": "#ff8566",
+          "attachment_type": "default",
+          "actions":
+            data.options.map((el, i) => ({
+              name: "pool",
+              text: `${this.slackHelperService.getSlackNumberEmoji(i)}`,
+              type: "button",
+              value: `${i}`
+            }))
+        }
+      ],
+    }
+
+    await this.httpService.post(`${this.SLACK_API}/chat.postMessage`, requestData, {headers: headersRequest}).toPromise()
+  }
+
+  async updateSlackMessage(data: PollActionDto, updatedFieldValue) {
+    const headersRequest = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
+    };
+
+    await this.httpService
+      .post(`${this.SLACK_API}/chat.update`,
+        {
+          "channel": `${data.channel.id}`,
+          "ts": `${data.message_ts}`,
+          "attachments": [
+            {
+              "fields": updatedFieldValue,
+              "text": data.original_message.attachments[0].text,
+              "callback_id": `${data.callback_id}`,
+              "color": "#ff8566",
+              "attachment_type": "default",
+              "actions": data.original_message.attachments[0].actions
+            }
+          ],
+        }, {headers: headersRequest}).toPromise()
+  }
+
+  async openPollDialog(triggerId) {
+    const headersRequest = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
+    };
+    console.log(`Opening slack dialog window, trigger_id: ${triggerId}`)
+
+    const requestData = {
+      "trigger_id": `${triggerId}`,
+      "dialog": {
+        "callback_id": `kudos-open-dialog`,
+        "title": "Create poll",
+        "submit_label": "OK",
+        "notify_on_cancel": false,
+        "elements": [
+          {
+            "type": "text",
+            "label": "Question",
+            "name": "question"
+          },
+          {
+            "type": "text",
+            "label": "Answer 1",
+            "name": "answer1"
+          },
+          {
+            "type": "text",
+            "label": "Answer 2",
+            "name": "answer2"
+          },
+          {
+            "type": "text",
+            "label": "Answer 3",
+            "name": "answer3"
+          },
+          {
+            "type": "text",
+            "label": "Answer 4",
+            "name": "answer4"
+          },
+          {
+            "type": "text",
+            "label": "Answer 5",
+            "name": "answer5"
+          }
+        ]
+      }
+    }
+
+    await this.httpService
+      .post(`${this.SLACK_API}/dialog.open`, requestData, {headers: headersRequest}).toPromise()
   }
 
   updateOptionValue(selectedValue: PollAction, values: FieldType[], user: PoolActionUser) {
@@ -47,7 +164,7 @@ export class PollService {
     return str.replace(word, '')
   }
 
-  clearTitle(str: string){
+  clearTitle(str: string) {
     return str.replace(/\(.*\)/, "");
   }
 
