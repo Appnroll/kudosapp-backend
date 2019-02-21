@@ -42,7 +42,7 @@ export class PollService {
   async sendSlackChatMessage(data: PollData, channelId: string) {
     const headersRequest = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
+      'Authorization': `Bearer ${process.env.POOL_SLACK_AUTH_TOKEN}`
     };
 
     const requestData = {
@@ -75,7 +75,7 @@ export class PollService {
   async updateSlackMessage(data: UpdateMessageActionDto, updatedFieldValue) {
     const headersRequest = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
+      'Authorization': `Bearer ${process.env.POOL_SLACK_AUTH_TOKEN}`
     };
 
     await this.httpService
@@ -99,7 +99,7 @@ export class PollService {
   async openPollDialog(triggerId) {
     const headersRequest = {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
+      'Authorization': `Bearer ${process.env.POOL_SLACK_AUTH_TOKEN}`
     };
     console.log(`Opening slack dialog window, trigger_id: ${triggerId}`)
 
