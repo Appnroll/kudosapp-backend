@@ -13,6 +13,12 @@ export class PollController {
   constructor(private slackService: SlackService, private pollService: PollService) {
   }
 
+  @Post('auth')
+  async auth(@Body() body: PollTriggerDto, @Res() res) {
+    console.log(body)
+    res.status(HttpStatus.OK).json()
+  }
+
   @Post()
   async pollCommand(@Body() body: PollTriggerDto, @Res() res) {
     console.log(body)
