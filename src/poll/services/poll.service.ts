@@ -6,7 +6,7 @@ import {
   PoolActionUser,
   UpdateMessageActionDto
 } from "../dto/poll-action.dto";
-import {SlackHelperService} from "../../services/slack-helper.service";
+import {SLACK_ACTION_TYPES, SlackHelperService} from "../../services/slack-helper.service";
 import {InjectConfig} from 'nestjs-config';
 
 export interface PollData {
@@ -55,7 +55,7 @@ export class PollService {
             short: false
           })),
           "text": `${data.question}`,
-          "callback_id": `poll-answer`,
+          "callback_id": `${SLACK_ACTION_TYPES.POLL_CREATE_POLL}`,
           "color": "#ff8566",
           "attachment_type": "default",
           "actions":
@@ -87,7 +87,7 @@ export class PollService {
             {
               "fields": updatedFieldValue,
               "text": data.original_message.attachments[0].text,
-              "callback_id": `${data.callback_id}`,
+              "callback_id": `${SLACK_ACTION_TYPES.POLL_ANSWER}`,
               "color": "#ff8566",
               "attachment_type": "default",
               "actions": data.original_message.attachments[0].actions
@@ -106,7 +106,7 @@ export class PollService {
     const requestData = {
       "trigger_id": `${triggerId}`,
       "dialog": {
-        "callback_id": `kudos-open-dialog`,
+        "callback_id": `${SLACK_ACTION_TYPES.POLL_OPEN_DIALOG}`,
         "title": "Create poll",
         "submit_label": "OK",
         "notify_on_cancel": false,

@@ -29,11 +29,11 @@ export class PollController {
   @Post('action')
   async pollAction(@Body() body: SlackActionDto, @Res() res) {
     console.log(body)
-    const payloadBody: CreatePollActionDto & UpdateMessageActionDto = JSON.parse(body.payload);
+    const payloadBody: any = body.payload
     const actionType = payloadBody.callback_id;
 
     switch (actionType) {
-      case SLACK_ACTION_TYPES.POLL_OPEN_DIALOG: {
+      case SLACK_ACTION_TYPES.POLL_CREATE_POLL: {
         const pollBody: PollData = this.pollService.extractPollDataFromDialog(payloadBody)
         await this.pollService.sendSlackChatMessage(pollBody, payloadBody.channel.id)
         break;
