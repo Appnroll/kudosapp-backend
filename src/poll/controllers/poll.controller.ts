@@ -1,10 +1,11 @@
 import {Body, Controller, HttpStatus, Post, Res} from '@nestjs/common';
 import {PollCreateDto} from "../dto/poll-create.dto";
 import {SlackService} from "../../kudos/services/slack.service";
-import {DialogPostSlackDto} from "../../kudos/dto/dialog-post-slack.dto";
-import {PollActionDto} from "../dto/poll-action.dto";
+import {SlackActionDto} from "../../kudos/dto/slack-action.dto";
+import {CreatePollActionDto, UpdateMessageActionDto} from "../dto/poll-action.dto";
 import {PollData, PollService} from "../services/poll.service";
 import {SLACK_ACTION_TYPES} from "../../services/slack-helper.service";
+import {PollTriggerDto} from "../dto/poll-trigger.dto";
 
 @Controller('poll')
 export class PollController {
@@ -13,27 +14,28 @@ export class PollController {
   }
 
   @Post()
-  async pollCommand(@Body() body: PollCreateDto, @Res() res) {
+  async pollCommand(@Body() body: PollTriggerDto, @Res() res) {
     await this.pollService.openPollDialog(body.trigger_id)
     res.status(HttpStatus.OK).json();
   }
 
   @Post('multiPoll')
   async multiPoll(@Body() body: PollCreateDto, @Res() res) {
-    const poolBody: PollData = this.pollService.extractPollData(body.text)
-    await this.pollService.sendSlackChatMessage(poolBody, body.channel_id)
+    const pollBody: PollData = this.pollService.extractPollData(body.text)
+    await this.pollService.sendSlackChatMessage(pollBody, body.channel_id)
     res.status(HttpStatus.OK).json();
   }
 
   @Post('action')
-  async pollAction(@Body() body: DialogPostSlackDto, @Res() res) {
+  async pollAction(@Body() body: SlackActionDto, @Res() res) {
     console.log(body)
-    const payloadBody: PollActionDto = JSON.parse(body.payload);
+    const payloadBody: CreatePollActionDto & UpdateMessageActionDto = JSON.parse(body.payload);
     const actionType = payloadBody.callback_id;
 
     switch (actionType) {
       case SLACK_ACTION_TYPES.POLL_OPEN_DIALOG: {
-        // await this.pollService.updateSlackMessage()
+        const pollBody: PollData = this.pollService.extractPollDataFromDialog(payloadBody)
+        await this.pollService.sendSlackChatMessage(pollBody, payloadBody.channel.name)
         break;
       }
       case SLACK_ACTION_TYPES.POLL_ANSWER: {

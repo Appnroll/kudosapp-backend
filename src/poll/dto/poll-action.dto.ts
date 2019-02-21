@@ -32,6 +32,15 @@ export interface PoolActionUser {
   id: string
 }
 
+export interface SubmissionPollActionType {
+  question: string,
+  option1: string;
+  option2: string;
+  option3: string;
+  option4: string;
+  option5: string;
+}
+
 export class PollActionDto {
   @ApiModelProperty()
   readonly user: PoolActionUser
@@ -42,11 +51,18 @@ export class PollActionDto {
   @ApiModelProperty()
   readonly message_ts: string;
   @ApiModelProperty()
+  readonly channel: { name: string, id: string }
+}
+
+export class UpdateMessageActionDto extends PollActionDto {
+  @ApiModelProperty()
   readonly original_message: { attachments: AttachmentData[] };
   @ApiModelProperty()
   readonly channel: { name: string, id: string }
   @ApiModelProperty()
   readonly actions: PollAction[]
+}
 
-
+export class CreatePollActionDto extends PollActionDto {
+  submission: SubmissionPollActionType
 }

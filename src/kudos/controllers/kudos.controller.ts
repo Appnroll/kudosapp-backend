@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpCode, Param, Post, Query, UseGuards } from '
 import { ApiBearerAuth, ApiForbiddenResponse, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import { AuthGuard } from '../../guards/auth.guard';
 import { SlackTokenGuard } from '../../guards/slackToken.guard';
-import { DialogPostSlackDto, PayloadClass } from '../dto/dialog-post-slack.dto';
+import { SlackActionDto, PayloadClass } from '../dto/slack-action.dto';
 import { KudosFromDto } from '../dto/kudos-from.dto';
 import { KudosGivenDto } from '../dto/kudos-given.dto';
 import { KudosRankingDto } from '../dto/kudos-ranking.dto';
@@ -187,7 +187,7 @@ export class KudosController {
     description: 'Internal endpoint used by slack to successfully commit dialog data',
     type: {},
   })
-  async saveSingleKudo(@Body() body: DialogPostSlackDto): Promise<void> {
+  async saveSingleKudo(@Body() body: SlackActionDto): Promise<void> {
     const payloadBody: PayloadClass = JSON.parse(body.payload);
     const timeWhenResponseUrlIsAvailable = this.slackHelperService.getSlackResponseDelay();
 

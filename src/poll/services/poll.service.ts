@@ -1,5 +1,11 @@
 import {HttpService, Injectable} from '@nestjs/common';
-import {FieldType, PollAction, PollActionDto, PoolActionUser} from "../dto/poll-action.dto";
+import {
+  CreatePollActionDto,
+  FieldType,
+  PollAction,
+  PoolActionUser,
+  UpdateMessageActionDto
+} from "../dto/poll-action.dto";
 import {SlackHelperService} from "../../services/slack-helper.service";
 import {InjectConfig} from 'nestjs-config';
 
@@ -23,6 +29,13 @@ export class PollService {
     const [question, ...options] = text.split(';')
     return {
       question: question.trim(), options: options.map(el => el.trim())
+    }
+  }
+
+  extractPollDataFromDialog({submission}: CreatePollActionDto): PollData {
+    const {question, ...rest} = submission
+    return {
+      question: question.trim(), options: Object.values(rest)
     }
   }
 
@@ -59,7 +72,7 @@ export class PollService {
     await this.httpService.post(`${this.SLACK_API}/chat.postMessage`, requestData, {headers: headersRequest}).toPromise()
   }
 
-  async updateSlackMessage(data: PollActionDto, updatedFieldValue) {
+  async updateSlackMessage(data: UpdateMessageActionDto, updatedFieldValue) {
     const headersRequest = {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${process.env.SLACK_OAUTH_TOKEN}`
@@ -106,27 +119,27 @@ export class PollService {
           {
             "type": "text",
             "label": "Answer 1",
-            "name": "answer1"
+            "name": "option1"
           },
           {
             "type": "text",
             "label": "Answer 2",
-            "name": "answer2"
+            "name": "option2"
           },
           {
             "type": "text",
             "label": "Answer 3",
-            "name": "answer3"
+            "name": "option3"
           },
           {
             "type": "text",
             "label": "Answer 4",
-            "name": "answer4"
+            "name": "option4"
           },
           {
             "type": "text",
             "label": "Answer 5",
-            "name": "answer5"
+            "name": "option5"
           }
         ]
       }
