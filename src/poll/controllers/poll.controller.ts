@@ -28,16 +28,8 @@ export class PollController {
 
   @Post('action')
   async pollAction(@Body() body: SlackActionDto, @Res() res) {
-    console.log(body)
-    const payloadBody: any = body.payload
-
-    console.log(payloadBody)
-
+    const payloadBody: CreatePollActionDto & UpdateMessageActionDto = JSON.parse(body.payload);
     const actionType = payloadBody.callback_id;
-
-    console.log(actionType)
-    console.log(payloadBody['callback_id'])
-
     switch (actionType) {
       case SLACK_ACTION_TYPES.POLL_CREATE_POLL: {
         console.log('here1')
