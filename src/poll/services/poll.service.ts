@@ -50,7 +50,7 @@ export class PollService {
       "attachments": [
         {
           "fields": data.options.map((el, i) => ({
-            title: `${this.slackHelperService.getSlackNumberEmoji(i)} - ${el}`,
+            title: `${this.slackHelperService.getSlackNumberEmoji(i + 1)} - ${el}`,
             value: "",
             short: false
           })),
@@ -61,7 +61,7 @@ export class PollService {
           "actions":
             data.options.map((el, i) => ({
               name: "pool",
-              text: `${this.slackHelperService.getSlackNumberEmoji(i)}`,
+              text: `${this.slackHelperService.getSlackNumberEmoji(i + 1)}`,
               type: "button",
               value: `${i}`
             }))
