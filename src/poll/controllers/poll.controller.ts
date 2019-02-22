@@ -17,7 +17,7 @@ export class PollController {
   @Get('auth')
   async auth(@Body() body: PollTriggerDto, @Res() res) {
     console.log(body)
-    this.slackAuthService.getToken(body)
+    await this.slackAuthService.getToken('')
     res.status(HttpStatus.OK).json()
   }
 
