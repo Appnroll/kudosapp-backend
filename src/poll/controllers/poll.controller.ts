@@ -1,4 +1,4 @@
-import {Body, Controller, HttpStatus, Post, Res} from '@nestjs/common';
+import {Body, Controller, Get, HttpStatus, Post, Res} from '@nestjs/common';
 import {PollCreateDto} from "../dto/poll-create.dto";
 import {SlackService} from "../../kudos/services/slack.service";
 import {SlackActionDto} from "../../kudos/dto/slack-action.dto";
@@ -6,23 +6,24 @@ import {CreatePollActionDto, UpdateMessageActionDto} from "../dto/poll-action.dt
 import {PollData, PollService} from "../services/poll.service";
 import {SLACK_ACTION_TYPES} from "../../services/slack-helper.service";
 import {PollTriggerDto} from "../dto/poll-trigger.dto";
+import {SlackAuthService} from "../../services/slack-auth.service";
 
 @Controller('poll')
 export class PollController {
 
-  constructor(private slackService: SlackService, private pollService: PollService) {
+  constructor(private slackService: SlackService, private pollService: PollService, private slackAuthService: SlackAuthService) {
   }
 
-  @Post('auth')
+  @Get('auth')
   async auth(@Body() body: PollTriggerDto, @Res() res) {
     console.log(body)
+    this.slackAuthService.getToken(body)
     res.status(HttpStatus.OK).json()
   }
 
   @Post()
   async pollCommand(@Body() body: PollTriggerDto, @Res() res) {
     console.log(body)
-
     await this.pollService.openPollDialog(body.trigger_id)
     res.status(HttpStatus.OK).json();
   }

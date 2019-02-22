@@ -17,42 +17,12 @@ export class SlackService {
               @InjectConfig() private readonly config,
               private readonly slackHelperService: SlackHelperService,
               private readonly httpService: HttpService) {
-    this.SLACK_API = this.config.get('slack').slackApi
+    this.SLACK_API = this.config.get('kudos').slackApi
   }
 
-
-  redirectAfterLogin(token: string, user: { name: string, id: string }) {
-    const params = stringify({
-      token,
-      name: user.name, id: user.id
-    })
-    return new URL(`${this.config.get('slack').slackAfterLoginRedirect}?${params}`)
-  }
-
-  async getToken(code: string) {
-    const slackClientSecret = this.config.get('slack').slackClientSecret;
-    const clientId = this.config.get('slack').slackClientId;
-    const redirectUri = this.config.get('slack').slackRedirectUri;
-    const headersRequest = {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    };
-    const paramsQueryString = stringify({
-      client_secret: slackClientSecret,
-      client_id: clientId,
-      code,
-      redirect_uri: redirectUri
-    })
-    return await this.httpService.post(`${this.SLACK_API}/oauth.access?${paramsQueryString}`, null, {headers: headersRequest})
-      .pipe(
-        map(res => {
-          return res.data
-        })
-      )
-      .toPromise();
-  }
 
   async fetchUsersWithAvatars() {
-    const req: any = await this.httpService.get(`${this.SLACK_API}/users.list?token=${this.config.get('slack').slackOAuthToken}`).toPromise()
+    const req: any = await this.httpService.get(`${this.SLACK_API}/users.list?token=${this.config.get('kudos').slackOAuthToken}`).toPromise()
     const users = get(req, 'data.members', []).map(el => ({
       name: el.name,
       slackId: el.id,
@@ -66,15 +36,7 @@ export class SlackService {
     await this.userRepository.save(usersEntities)
   }
 
-  async revokeToken(token: string) {
-    const headersRequest = {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    };
-    const paramsQueryString = stringify({
-      token,
-    })
-    await this.httpService.get(`${this.SLACK_API}/auth.revoke?${paramsQueryString}`, {headers: headersRequest}).toPromise()
-  }
+
 
   async openKudoSlackDialog(triggerId) {
     const headersRequest = {

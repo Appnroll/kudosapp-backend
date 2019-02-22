@@ -16,11 +16,24 @@ import {SlackToken} from "./model/slack-token.entity";
 import {DateService} from './services/date.service';
 import {PollModule} from "../poll/poll.module";
 import {SlackHelperService} from "../services/slack-helper.service";
+import {ConfigService} from 'nestjs-config';
+import {SlackAuthService} from "../services/slack-auth.service";
+
+const SlackOAuthConfigService = {
+  provide: 'SlackOAuthConfigService',
+  useFactory: (config: ConfigService) => config.get('kudos'),
+  inject: [ConfigService],
+};
 
 @Module({
   imports: [PollModule, TypeOrmModule.forFeature([Kudos, User, UserKudosEntity, SlackToken, UserPresentEntity]), HttpModule],
   controllers: [KudosController, SlackController, TrelloController],
-  providers: [KudosService, SlackService, UserService, TrelloService, UserTokenService, DateService, SlackHelperService]
+  providers: [KudosService, SlackService, UserService, TrelloService,
+    UserTokenService,
+    DateService,
+    SlackAuthService,
+    SlackHelperService,
+    SlackOAuthConfigService]
 })
 export class KudosModule {
 }

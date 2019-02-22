@@ -22,7 +22,7 @@ export class PollService {
   constructor(@InjectConfig() private readonly config,
               private readonly slackHelperService: SlackHelperService,
               private readonly httpService: HttpService) {
-    this.SLACK_API = this.config.get('slack').slackApi
+    this.SLACK_API = this.config.get('kudos').slackApi
   }
 
   extractPollData(text: string): PollData {

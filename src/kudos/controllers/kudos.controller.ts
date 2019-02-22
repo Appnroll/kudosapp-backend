@@ -15,6 +15,7 @@ import { KudosService } from '../services/kudos.service';
 import { SlackService } from '../services/slack.service';
 import { UserService } from '../services/user.service';
 import {SlackHelperService} from "../../services/slack-helper.service";
+import {SlackAuthService} from "../../services/slack-auth.service";
 
 @Controller('kudos')
 @ApiUseTags('kudos')
@@ -23,6 +24,7 @@ export class KudosController {
   constructor(private readonly kudosService: KudosService,
               private readonly userService: UserService,
               private readonly slackHelperService: SlackHelperService,
+              private readonly slackAuthService: SlackAuthService,
               private readonly slackService: SlackService) {
   }
 
