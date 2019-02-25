@@ -9,6 +9,7 @@ import {AvailabilityController} from './controllers/availability.controller';
 import {UserPresentEntity} from './model/user-present.entity';
 import {SlackHelperService} from "../services/slack-helper.service";
 import {ConfigService} from 'nestjs-config';
+import {SlackAuthService} from "../services/slack-auth.service";
 
 const SlackOAuthConfigService = {
   provide: 'SlackOAuthConfigService',
@@ -19,7 +20,7 @@ const SlackOAuthConfigService = {
 @Module({
   controllers: [AvailabilityController],
   imports: [TypeOrmModule.forFeature([User, UserPresentEntity, SlackToken]), HttpModule],
-  providers: [SlackService, UserService, UserTokenService, SlackHelperService, SlackOAuthConfigService],
+  providers: [SlackService, UserService, UserTokenService, SlackHelperService, SlackAuthService, SlackOAuthConfigService],
 })
 export class AvailabilityModule {
 }
