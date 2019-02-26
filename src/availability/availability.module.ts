@@ -13,7 +13,7 @@ import {SlackAuthService} from "../services/slack-auth.service";
 
 const SlackOAuthConfigService = {
   provide: 'SlackOAuthConfigService',
-  useFactory: (config: ConfigService) => config.get('kudos'),
+  useFactory: (config: ConfigService) => config.get('availability'),
   inject: [ConfigService],
 };
 

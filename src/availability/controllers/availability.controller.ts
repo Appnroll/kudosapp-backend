@@ -19,9 +19,13 @@ export class AvailabilityController {
   @Get('redirect')
   @HttpCode(200)
   async getTokenAndRedirect(@Query() query, @Res() res) {
+    console.log('query')
+    console.log(query)
     const {access_token, user} = await this.slackAuthService.getToken(query.code);
     await this.userTokenService.saveOrUpdate(access_token, user.id)
     const redirectUri = this.slackAuthService.redirectAfterLogin(access_token, user);
+    console.log('redirect_uri')
+    console.log(redirectUri)
     return res.redirect(redirectUri.toString())
   }
 
