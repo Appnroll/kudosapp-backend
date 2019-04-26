@@ -14,6 +14,7 @@ async function bootstrap() {
     .setTitle('KudosApp - API')
     .setDescription('The Kudos app API description')
     .setVersion('1.0')
+    .setSchemes('https')
     .addTag('slack')
     .addTag('kudos')
     .build();
