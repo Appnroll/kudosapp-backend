@@ -1,5 +1,5 @@
-import {Controller, Get} from '@nestjs/common';
-import {TrelloService} from "../services/trello.service";
+import { Controller, Get } from '@nestjs/common';
+import { TrelloService } from "../services/trello.service";
 
 @Controller('trello')
 export class TrelloController {
@@ -14,7 +14,11 @@ export class TrelloController {
 
   @Get('/users')
   async getUsers() {
-    await this.trelloService.saveTrelloUsers();
+    try {
+      await this.trelloService.saveTrelloUsers();
+    } catch (e) {
+      return {error: e.toString()}
+    }
   }
 
 }

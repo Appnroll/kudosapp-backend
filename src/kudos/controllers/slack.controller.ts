@@ -26,7 +26,11 @@ export class SlackController {
   @Get('avatars')
   @HttpCode(200)
   async fetchAvatars() {
-    await this.slackService.fetchUsersWithAvatars();
+    try {
+      await this.slackService.fetchUsersWithAvatars();
+    } catch (err){
+      return {error: err.toString()}
+    }
     return {status: 'ok'};
   }
 

@@ -23,6 +23,11 @@ export class SlackService {
 
   async fetchUsersWithAvatars() {
     const req: any = await this.httpService.get(`${this.SLACK_API}/users.list?token=${this.config.get('kudos').slackOAuthToken}`).toPromise()
+
+    if(!req.data.ok){
+      throw new Error(`Could not fetch users, reason: ${req.data.error}`)
+    }
+
     const users = get(req, 'data.members', []).map(el => ({
       name: el.name,
       slackId: el.id,
@@ -32,6 +37,8 @@ export class SlackService {
       image_72: el.profile.image_72,
       image_192: el.profile.image_192
     }))
+
+    //todo: add only new users
     const usersEntities = this.userRepository.create(users)
     await this.userRepository.save(usersEntities)
   }

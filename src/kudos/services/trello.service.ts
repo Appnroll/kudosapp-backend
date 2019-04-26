@@ -91,14 +91,18 @@ export class TrelloService {
   private async matchUsersToCurrentSlackUsers(trelloUsers: TrelloUser[]) {
     const currentUsers = await this.userService.findAll();
     trelloUsers.forEach(({id, username}) => {
-      const {slackId} = this.USERS_SLACK_TRELLO_MAP.find(({trelloUserName}) => trelloUserName == username)
+      const {slackId} = this.USERS_SLACK_TRELLO_MAP.find(({trelloUserName}) => trelloUserName == username) || {slackId: ''}
       const user = currentUsers.find(({slackId: userSlackId}) => slackId == userSlackId);
-      user.trelloId = id
-      user.trelloName = username
+      if(user){
+        user.trelloId = id
+        user.trelloName = username
+      }
+
     });
     await this.userService.saveUsers(currentUsers);
   }
 
+  //TODO: add new users to map
   private USERS_SLACK_TRELLO_MAP = [
     {slackId: 'UF5NBJ9E3', trelloUserName: 'karolwozniak5'} as TrelloSlackUser,
     {slackId: 'U8M222HRS', trelloUserName: 'gosia581'} as TrelloSlackUser,
