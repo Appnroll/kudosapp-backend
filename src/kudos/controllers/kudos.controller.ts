@@ -2,7 +2,7 @@ import { Body, Controller, Get, HttpCode, Param, Post, Query, UseGuards } from '
 import { ApiBearerAuth, ApiForbiddenResponse, ApiResponse, ApiUseTags } from '@nestjs/swagger';
 import { AuthGuard } from '../../guards/auth.guard';
 import { SlackTokenGuard } from '../../guards/slackToken.guard';
-import { DialogPostSlackDto, PayloadClass } from '../dto/dialog-post-slack.dto';
+import { SlackActionDto, PayloadClass } from '../dto/slack-action.dto';
 import { KudosFromDto } from '../dto/kudos-from.dto';
 import { KudosGivenDto } from '../dto/kudos-given.dto';
 import { KudosRankingDto } from '../dto/kudos-ranking.dto';
@@ -14,14 +14,18 @@ import { SingleKudosSlackDto } from '../dto/single-kudos-slack.dto';
 import { KudosService } from '../services/kudos.service';
 import { SlackService } from '../services/slack.service';
 import { UserService } from '../services/user.service';
+import {SlackHelperService} from "../../services/slack-helper.service";
+import {SlackAuthService} from "../../services/slack-auth.service";
 
 @Controller('kudos')
 @ApiUseTags('kudos')
 export class KudosController {
 
-  constructor(private kudosService: KudosService,
-              private userService: UserService,
-              private slackService: SlackService) {
+  constructor(private readonly kudosService: KudosService,
+              private readonly userService: UserService,
+              private readonly slackHelperService: SlackHelperService,
+              private readonly slackAuthService: SlackAuthService,
+              private readonly slackService: SlackService) {
   }
 
   @Get()
@@ -147,16 +151,16 @@ export class KudosController {
     type: KudosGivenDto,
   })
   async postSlack(@Body() body: PostSlackDto): Promise<{ text: string }> {
-    const timeWhenResponseUrlIsAvailable = this.slackService.getSlackResponseDelay();
+    const timeWhenResponseUrlIsAvailable = this.slackHelperService.getSlackResponseDelay();
     const [usersString, description] = body.text.split(';');
     const givenToUsersNames = usersString.replace(/\s+/g, ' ').trim().split(' ');
     const [fromUser, givenToUsers] = await Promise.all([this.userService.findByName(body.user_name), this.userService.findByUsersName(givenToUsersNames)]);
 
     if (!givenToUsers || givenToUsers.length === 0 || !fromUser) {
-      this.slackService.responseInvalidUsername(body.response_url, timeWhenResponseUrlIsAvailable);
+      this.slackHelperService.responseInvalidUsername(body.response_url, timeWhenResponseUrlIsAvailable);
     } else {
       await this.kudosService.saveKudos(description, fromUser, givenToUsers);
-      this.slackService.responseOk(body.response_url, timeWhenResponseUrlIsAvailable);
+      this.slackHelperService.responseOk(body.response_url, timeWhenResponseUrlIsAvailable);
     }
     return { text: '✅ Thanks for submitting Kudos!' };
   }
@@ -172,7 +176,7 @@ export class KudosController {
     type: {},
   })
   async singleKudo(@Body() body: SingleKudosSlackDto): Promise<void> {
-    await this.slackService.openSlackDialog(body.trigger_id);
+    await this.slackService.openKudoSlackDialog(body.trigger_id);
   }
 
   @Post('slack')
@@ -185,12 +189,12 @@ export class KudosController {
     description: 'Internal endpoint used by slack to successfully commit dialog data',
     type: {},
   })
-  async saveSingleKudo(@Body() body: DialogPostSlackDto): Promise<void> {
+  async saveSingleKudo(@Body() body: SlackActionDto): Promise<void> {
     const payloadBody: PayloadClass = JSON.parse(body.payload);
-    const timeWhenResponseUrlIsAvailable = this.slackService.getSlackResponseDelay();
+    const timeWhenResponseUrlIsAvailable = this.slackHelperService.getSlackResponseDelay();
 
     if (!payloadBody.submission.kudos_given) {
-      this.slackService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable);
+      this.slackHelperService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable);
       return;
     }
 
@@ -198,7 +202,7 @@ export class KudosController {
     const fromUser = await this.userService.findByName(payloadBody.user.name);
 
     if (!givenToUser || !fromUser) {
-      this.slackService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable);
+      this.slackHelperService.responseInvalidUsername(payloadBody.response_url, timeWhenResponseUrlIsAvailable);
       return;
     }
 
@@ -207,7 +211,7 @@ export class KudosController {
       fromUser,
       [givenToUser],
     );
-    this.slackService.responseOk(payloadBody.response_url, timeWhenResponseUrlIsAvailable);
+    this.slackHelperService.responseOk(payloadBody.response_url, timeWhenResponseUrlIsAvailable);
   }
 
 }
